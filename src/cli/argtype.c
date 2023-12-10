@@ -10,7 +10,7 @@
  * Parses hex data into a binary arg
  */
 struct BinArg* Argtype_Hex(char* hex) {
-    struct HexData data = Hex_Parse(hex);
+    struct HexData data = Hex_Decode(hex);
     if (data.valid) {
         struct BinArg *arg = malloc(sizeof(struct BinArg));
         if (arg != NULL) {

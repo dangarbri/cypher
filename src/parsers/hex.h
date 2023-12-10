@@ -17,6 +17,6 @@ struct HexData {
  * @return Parsed data buffer. You're responsible for freeing the buffer
  *         If parsing failed, valid bit will be false.
  */
-struct HexData Hex_Parse(char* hex);
+struct HexData Hex_Decode(char* hex);
 
 #endif

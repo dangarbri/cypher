@@ -4,7 +4,7 @@
 
 #include "hex.h"
 
-struct HexData Hex_Parse(char* hex) {
+struct HexData Hex_Decode(char* hex) {
     struct HexData result = {
         .data = NULL,
         .length = 0,

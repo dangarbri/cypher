@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <openssl/bio.h>
+#include <openssl/buffer.h>
+#include <openssl/evp.h>
+
 #include "../src/base64/base64.h"
 
 void test_Base64_Decode() {
@@ -15,7 +19,19 @@ void test_Base64_Decode() {
     free(result.data);
 }
 
+void test_Base64_Encode() {
+    char* hello_world = "Hello, world!";
+    char* expected_result = "SGVsbG8sIHdvcmxkIQ==";
+    size_t length = strlen(expected_result);
+    struct Base64Data result = Base64_Encode(hello_world, strlen(hello_world));
+    char* encoded_str = (char*) result.data;
+    assert(result.length == length);
+    assert(strncmp(expected_result, encoded_str, length) == 0);
+    free(result.data);
+}
+
 int main() {
     test_Base64_Decode();
+    test_Base64_Encode();
     return 0;
 }

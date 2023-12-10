@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "sbxor.h"
 
 struct XorData SBX_Perform(uint8_t key, uint8_t* data, size_t length) {

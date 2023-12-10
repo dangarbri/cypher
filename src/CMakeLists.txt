@@ -8,6 +8,7 @@ add_executable(cypher
   cli/subcommand.c
   commands/base64_cli.c
   commands/xor_cli.c
+  operations/sbxor.c
   operations/xor.c
   parsers/base64.c
   parsers/hex.c

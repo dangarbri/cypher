@@ -44,7 +44,19 @@ struct Base64Data Base64_Encode(uint8_t* data, size_t length) {
                 BIO_flush(b64);
                 // Extract encoded data from the encoded bio
                 result.length = BIO_claim_data(encoded, &result.data);
-                result.valid = true;
+                // The result is not null terminated, so let's fix that
+                // Allocate another buffer that is 1 byte larger than the length for space for the null byte.
+                result.data = realloc(result.data, result.length + 1);
+                if (result.data != NULL) {
+                    result.data[result.length] = '\0';
+                    result.valid = true;
+                } else {
+                    perror("Base64_Encode: ");
+                    // Free the original buffer, clear the data and return with valid = false
+                    free(result.data);
+                    result.data = NULL;
+                    result.length = 0;
+                }
                 BIO_free(b64);
             } else {
                 fputs("Failed to encode base64 data\n", stderr);

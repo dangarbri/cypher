@@ -5,6 +5,7 @@
 #include "base64.h"
 #include "base64_cli.h"
 #include "cli/subcommand.h"
+#include "cli/argtype.h"
 
 int b64_print_usage(int argc, char* argv[]);
 int b64_print_help(int argc, char* argv[]);
@@ -30,6 +31,11 @@ int b64_print_usage(int argc, char* argv[]) {
 }
 
 int b64_print_help(int argc, char** argv) {
+    puts("For encoding, you may use the hex: modifier to send binary data as a hex string");
+    puts("EXAMPLE:");
+    puts("  This would encode the bytes de ad be ef. Not the word deadbeef");
+    puts("  base64 -e hex:deadbeef");
+    puts("");
     puts("OPTIONS:");
     puts("  -d encoded_message    Decodes encoded_messages and writes result to stdout");
     puts("  -e message            Encodes message and writes result to stdout");
@@ -44,7 +50,15 @@ int b64_encode(int argc, char** argv) {
         return -1;
     }
     char* message_to_encode = argv[1];
-    struct Base64Data data = Base64_Encode((uint8_t*) message_to_encode, strlen(message_to_encode));
+    size_t length = strlen(message_to_encode);
+    struct Arg* arg = Argtype_New(message_to_encode);
+    if (arg->type == ARGTYPE_BINARY) {
+        struct BinArg* barg = (struct BinArg*) arg;
+        message_to_encode = (char*) barg->data;
+        length = barg->length;
+    }
+    struct Base64Data data = Base64_Encode((uint8_t*) message_to_encode, length);
+    Argtype_Free(arg);
     if (!data.valid) {
         fputs("Sorry, I couldn't encode that!\n", stderr);
         return -1;

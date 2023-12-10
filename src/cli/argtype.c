@@ -45,7 +45,7 @@ struct Arg* Argtype_String(char* arg) {
     struct Arg* result = malloc(sizeof(struct Arg));
     if (result != NULL) {
         result->type = ARGTYPE_STRING;
-        result->arg = arg;
+        result->arg = (uint8_t*) arg;
         return result;
     }
     return NULL;

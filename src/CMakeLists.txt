@@ -4,9 +4,11 @@ enable_testing()
 
 add_executable(cypher
   main.c
+  cli/argtype.c
   cli/subcommand.c
   base64/base64.c
   base64/base64_cli.c
+  parsers/hex.c
 )
 target_include_directories(cypher PUBLIC
   ../src

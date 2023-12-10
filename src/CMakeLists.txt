@@ -7,12 +7,18 @@ add_executable(cypher
   cli/subcommand.c
 )
 
+# Test Section
 add_executable(test_subcommand
   ../test/test_subcommand.c
   cli/subcommand.c
 )
+add_executable(test_parsers
+  ../test/test_parsers.c
+  parsers/hex.c
+)
 
 add_test(NAME Subcommands COMMAND test_subcommand)
+add_test(NAME Parsers COMMAND test_parsers)
 
 # Eventually will need to add openssl to this.
 # target_link_libraries()

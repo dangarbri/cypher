@@ -39,12 +39,12 @@ size_t Subcommand_GetLongestNameLength(struct Subcommand* commands[]) {
     return longest;
 }
 
-int Subcommand_Run(char* selector, struct Subcommand commands[], char* argv[]) {
+int Subcommand_Run(char* selector, struct Subcommand commands[], int argc, char* argv[]) {
     struct Subcommand* cmd = Subcommand_Find(selector, &commands);
     if (cmd == NULL) {
         return SUBCOMMAND_NOT_FOUND;
     }
-    return cmd->fn(argv);
+    return cmd->fn(argc, argv);
 }
 
 void Subcommand_PrintHelp(struct Subcommand commands[]) {

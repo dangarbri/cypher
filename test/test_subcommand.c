@@ -2,11 +2,11 @@
 #include <string.h>
 #include "../src/cli/subcommand.h"
 
-int beepboop(char** argv) {
+int beepboop(int argc, char** argv) {
     return 10;
 }
 
-int dummy_subcommand(char** argv) {
+int dummy_subcommand(int argc, char** argv) {
     char* expected_argv = "hello";
     assert(strncmp(expected_argv, argv[0], strlen(expected_argv)) == 0);
     return 99;
@@ -19,11 +19,11 @@ struct Subcommand commands[] = {
 };
 
 void test_Subcommand_Run() {
-    char* args[] = {"hello", NULL};
-    int result = Subcommand_Run("dummy", commands, args);
+    char* args[] = {"hello"};
+    int result = Subcommand_Run("dummy", commands, 1, args);
     assert(result == 99);
 
-    result = Subcommand_Run("nonexistent_command", commands, args);
+    result = Subcommand_Run("nonexistent_command", commands, 1, args);
     assert(result == SUBCOMMAND_NOT_FOUND);
 }
 

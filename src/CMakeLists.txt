@@ -6,6 +6,10 @@ add_executable(cypher
   main.c
   cli/subcommand.c
   base64/base64.c
+  base64/base64_cli.c
+)
+target_include_directories(cypher PUBLIC
+  ../src
 )
 target_link_libraries(cypher
   LINK_PRIVATE ssl

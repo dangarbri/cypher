@@ -3,12 +3,11 @@
 
 /**
  * Function type for a subcommand
- * @note argv[0] is the first argument for the subcommand, it is not the program name.
  * @param argc number of arguments
  * @param argv CLI arguments
  * @return return status
  */
-typedef int (*SubcommandFn)(char* argv[]);
+typedef int (*SubcommandFn)(int argc, char* argv[]);
 
 /**
  * Contains metadata about a CLI sub command
@@ -28,10 +27,11 @@ struct Subcommand {
  * Find and run the given subcommand out of the list of available subcommands
  * @param selector Name of the subcommand to run.
  * @param commands List of all available subcommands, terminated by NULL command (char* name = NULL).
- * @param argv NULL terminated list of arguments to pass to the subcommand
+ * @param argc Length of argv
+ * @param argv Arguments passed to the subcommand
  * @returns Return status of the executed subcommand, or SUBCOMMAND_NOT_FOUND (-1) if the subcommand is not found.
  */
-int Subcommand_Run(char* selector, struct Subcommand commands[], char* argv[]);
+int Subcommand_Run(char* selector, struct Subcommand commands[], int argc, char* argv[]);
 
 /**
  * Prints the help messages of all given subcommands to stdout

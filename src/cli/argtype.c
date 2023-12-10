@@ -21,6 +21,8 @@ struct Arg* Argtype_Hex(char* hex) {
         } else {
             perror("Argtype_Hex: ");
         }
+    } else {
+        fprintf(stderr, "Unable to parse hex: `%s`\n", hex);
     }
     return NULL;
 }
@@ -37,6 +39,8 @@ struct Arg* Argtype_Base64(char* base64) {
         } else {
             perror("Argtype_Base64: ");
         }
+    } else {
+        fprintf(stderr, "Unable to parse base64: `%s`\n", base64);
     }
     return NULL;
 }
@@ -48,6 +52,8 @@ struct Arg* Argtype_String(char* arg) {
         result->data = (uint8_t*) arg;
         result->length = strlen(arg);
         return result;
+    } else {
+        perror("Argtype_String: ");
     }
     return NULL;
 }

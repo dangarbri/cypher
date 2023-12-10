@@ -20,6 +20,9 @@ add_test(NAME Subcommands COMMAND test_subcommand)
 # Make sure we are using C17
 set_property(TARGET cypher PROPERTY C_STANDARD 17)
 
+# Add debug flags for debug build
+string(APPEND CMAKE_C_FLAGS_DEBUG_INIT " -Og -ggdb3")
+
 # Enable warnings
 if(MSVC)
   target_compile_options(cypher PRIVATE /W4 /WX)

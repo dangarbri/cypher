@@ -79,7 +79,7 @@ char* Hex_Encode(uint8_t* data, size_t length) {
     char* out = malloc(buflen);
     if (out != NULL) {
         for (size_t i = 0; i < length; i++) {
-            snprintf(&out[i*2], 3, "%x", data[i]);
+            snprintf(&out[i*2], 3, "%02x", data[i]);
         }
         out[buflen - 1] = '\0';
         return out;

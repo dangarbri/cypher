@@ -88,7 +88,11 @@ int Base64(int argc, char** argv) {
         b64_print_usage(0, NULL);
         return 1;
     } else {
-        return Subcommand_Run(argv[1], b64_commands, argc - 1, &argv[1]);
+        int result = Subcommand_Run(argv[1], b64_commands, argc - 1, &argv[1]);
+        if (result == SUBCOMMAND_NOT_FOUND) {
+            fprintf(stderr, "Invalid option '%s'\n", argv[1]);
+        }
+        return result;
     }
     return 0;
 }

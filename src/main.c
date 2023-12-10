@@ -1,12 +1,14 @@
 #include <stdio.h>
 #include "cli/subcommand.h"
 #include "commands/base64_cli.h"
+#include "commands/xor_cli.h"
 
 int print_help(int argc, char* argv[]);
 
 struct Subcommand commands[] = {
     {"help", "prints this help message", print_help},
     {"base64", "base64 encoding utilities", Base64},
+    {"xor", "xor on cli arguments", XorCmd},
     {NULL}
 };
 

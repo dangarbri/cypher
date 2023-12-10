@@ -135,7 +135,16 @@ int XorCmd(int argc, char* argv[]) {
 int sbx_cli_crack(int argc, char* argv[]) {
     (void)argv;
     if (argc != 2) {
-        fprintf(stderr, "Expected 1 arg, got %d\n", argc-1);
+        puts("cracksbx will crack a single byte xor cipher.");
+        puts("There are only 255 possible permutations of a single byte xor cipher");
+        puts("cracksbx will analyze each permutation and perform");
+        puts("frequency analysis on the results to choose the");
+        puts("permutation which seems the most like english plaintext");
+        puts("Currently only the english language is supported");
+        puts("Pull requests to support other languages would be nice");
+        puts("");
+        puts("Usage:");
+        puts("  cracksbx ciphertext");
         return EXIT_FAILURE;
     } else {
         puts("Not implemented yet");

@@ -71,3 +71,20 @@ struct HexData Hex_Decode(char* hex) {
     result.valid = true;
     return result;
 }
+
+char* Hex_Encode(uint8_t* data, size_t length) {
+    // Each byte is 2 characters
+    // +1 for the null terminator
+    size_t buflen = length * 2 + 1;
+    char* out = malloc(buflen);
+    if (out != NULL) {
+        for (size_t i = 0; i < length; i++) {
+            snprintf(&out[i*2], 3, "%x", data[i]);
+        }
+        out[buflen - 1] = '\0';
+        return out;
+    } else {
+        perror("Hex_Encode: ");
+        return NULL;
+    }
+}

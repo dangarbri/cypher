@@ -20,8 +20,17 @@ void test_Hex_Decode_Invalid() {
     assert(hex.valid == false);
 }
 
+void test_Hex_Encode() {
+    char* hello = "Hello";
+    char* result = Hex_Encode(hello, 5);
+    assert(result != NULL);
+    assert(strlen(result) == 10);
+    assert(strncmp(result, "48656c6c6f", 10) == 0);
+}
+
 int main() {
     test_Hex_Decode();
     test_Hex_Decode_Invalid();
+    test_Hex_Encode();
     return 0;
 }

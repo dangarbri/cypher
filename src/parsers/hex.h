@@ -19,4 +19,13 @@ struct HexData {
  */
 struct HexData Hex_Decode(char* hex);
 
+/**
+ * Formats a buffer into an allocated hex string
+ * You must free the returned string buffer
+ * @param data Data to encode
+ * @param length Number of bytes to process
+ * @return string buffer or NULL on error
+ */
+char* Hex_Encode(uint8_t* data, size_t length);
+
 #endif

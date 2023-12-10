@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include "cli/subcommand.h"
+#include "base64/base64.h"
 
 int print_help(char* argv[]);
 
 struct Subcommand commands[] = {
     {"help", "prints this help message", print_help},
+    {"base64", "base64 encoding utilities", Base64},
     {NULL}
 };
 

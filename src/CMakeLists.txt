@@ -5,12 +5,25 @@ enable_testing()
 add_executable(cypher
   main.c
   cli/subcommand.c
+  base64/base64.c
+)
+target_link_libraries(cypher
+  LINK_PRIVATE ssl
+  LINK_PRIVATE crypto
 )
 
 # Test Section
 add_executable(test_subcommand
   ../test/test_subcommand.c
   cli/subcommand.c
+)
+add_executable(test_base64
+  ../test/test_base64.c
+  base64/base64.c
+)
+target_link_libraries(test_base64
+  LINK_PRIVATE ssl
+  LINK_PRIVATE crypto
 )
 add_executable(test_parsers
   ../test/test_parsers.c
@@ -19,6 +32,7 @@ add_executable(test_parsers
 
 add_test(NAME Subcommands COMMAND test_subcommand)
 add_test(NAME Parsers COMMAND test_parsers)
+add_test(NAME Base64 COMMAND test_base64)
 
 # Eventually will need to add openssl to this.
 # target_link_libraries()

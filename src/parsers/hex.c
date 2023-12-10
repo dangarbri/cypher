@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "hex.h"
@@ -20,6 +21,10 @@ struct HexData Hex_Parse(char* hex) {
 
     // Allocate memory for the data
     uint8_t* data = malloc(bytelen);
+    if (data == NULL) {
+        perror("Failed to allocate memory for hex parser data");
+        return result;
+    }
 
     // Use strtoll to parse long long bytes at a time.
     uint8_t typesize = sizeof(long long);
@@ -29,6 +34,10 @@ struct HexData Hex_Parse(char* hex) {
     // Which it will be almost every time, so copy it into a buffer
     // to parse the right number of bytes at a time.
     char* staging_str = malloc(staging_strlen + 1);
+    if (data == NULL) {
+        perror("Failed to allocate memory for hex parser staging");
+        return result;
+    }
     // Set null byte on the string
     staging_str[staging_strlen] = 0;
     size_t bytes_copied = 0;

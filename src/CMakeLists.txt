@@ -4,9 +4,9 @@ enable_testing()
 
 add_executable(cypher
   main.c
-  base64/base64_cli.c
   cli/argtype.c
   cli/subcommand.c
+  commands/base64_cli.c
   operations/xor.c
   parsers/base64.c
   parsers/hex.c

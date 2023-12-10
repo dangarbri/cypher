@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include "cli/subcommand.h"
-#include "base64/base64_cli.h"
+#include "commands/base64_cli.h"
 
 int print_help(int argc, char* argv[]);
 

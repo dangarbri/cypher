@@ -14,7 +14,14 @@ void test_Hex_Parse() {
     free(hex.data);
 }
 
+void test_Hex_Parse_Invalid() {
+    char* data = "12345678GGGG";
+    struct HexData hex = Hex_Parse(data);
+    assert(hex.valid == false);
+}
+
 int main() {
     test_Hex_Parse();
+    test_Hex_Parse_Invalid();
     return 0;
 }

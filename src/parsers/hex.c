@@ -45,7 +45,15 @@ struct HexData Hex_Parse(char* hex) {
         // Copy the next set of data into the staging area
         strncpy(staging_str, &hex[i], staging_strlen);
         // Get the string value as a number
-        long long value = strtoll(staging_str, NULL, 16);
+        char* endptr = NULL;
+        long long value = strtoll(staging_str, &endptr, 16);
+        // String is invalid!
+        if (*endptr != '\0') {
+            fprintf(stderr, "Invalid value %s in hex string", endptr);
+            free(staging_str);
+            free(data);
+            return result;
+        }
         // Copy the data into the output buffer
         size_t bytes_left = bytelen - bytes_copied;
         size_t bytes_to_copy = typesize < bytes_left ? typesize : bytes_left;

@@ -21,6 +21,10 @@ add_executable(test_subcommand
   ../test/test_subcommand.c
   cli/subcommand.c
 )
+add_executable(test_argtype
+  ../test/test_argtype.c
+  cli/argtype.c
+)
 add_executable(test_base64
   ../test/test_base64.c
   base64/base64.c
@@ -37,6 +41,7 @@ add_executable(test_parsers
 add_test(NAME Subcommands COMMAND test_subcommand)
 add_test(NAME Parsers COMMAND test_parsers)
 add_test(NAME Base64 COMMAND test_base64)
+add_test(NAME Argtype COMMAND test_argtype)
 
 # Eventually will need to add openssl to this.
 # target_link_libraries()

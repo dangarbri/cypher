@@ -6,11 +6,6 @@
 
 #include "base64.h"
 
-int Base64(char** argv) {
-    (void) argv;
-    return 0;
-}
-
 /**
  * Claims the underlying data from the given bio.
  * Calling BIO_free will free the bio without freeing the data.

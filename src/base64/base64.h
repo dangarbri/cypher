@@ -32,9 +32,4 @@ struct Base64Data Base64_Encode(uint8_t* data, size_t length);
  */
 struct Base64Data Base64_Decode(char* data);
 
-/**
- * Base64 subcommand
- */
-int Base64(char** argv);
-
 #endif

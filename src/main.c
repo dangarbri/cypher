@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include "cli/subcommand.h"
-#include "base64/base64.h"
+#include "base64/base64_cli.h"
 
-int print_help(char* argv[]);
+int print_help(int argc, char* argv[]);
 
 struct Subcommand commands[] = {
     {"help", "prints this help message", print_help},
@@ -10,8 +10,10 @@ struct Subcommand commands[] = {
     {NULL}
 };
 
-int print_help(char* argv[]) {
-    (void) argv; // supress warning
+int print_help(int argc, char* argv[]) {
+    // supress warnings
+    (void) argc;
+    (void) argv;
     puts("Welcome to cypher, the encryption cracking toolkit");
     puts("This program may be used to exploit cryptographic");
     puts("deficiencies as demonstrated in the cryptopals challenges");
@@ -24,9 +26,9 @@ int print_help(char* argv[]) {
 int main(int argc, char** argv) {
     (void) argv;
     if (argc <= 1) {
-        print_help(NULL);
+        print_help(0, NULL);
         return 1;
     } else {
-        return Subcommand_Run(argv[1], commands, &argv[2]);
+        return Subcommand_Run(argv[1], commands, argc - 1, &argv[1]);
     }
 }

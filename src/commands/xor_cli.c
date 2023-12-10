@@ -10,10 +10,12 @@
 #include "xor_cli.h"
 
 int sbx_cli_cmd(int argc, char* argv[]);
+int sbx_cli_crack(int argc, char* argv[]);
 int perform_xor(char* a, char* b);
 
 struct Subcommand xor_commands[] = {
     {"sbx", "single byte xor operation", sbx_cli_cmd},
+    {"cracksbx", "crack a single byte xor cipher", sbx_cli_crack},
     {NULL}
 };
 
@@ -21,8 +23,6 @@ void xor_usage() {
     puts("The xor command allows you to xor items on the command line");
     puts("The output is printed as a hex string");
     puts("Inputs can be prefixed with 'hex:' or 'base64': to xor binary data on the cli");
-    puts("When using sbx, the first argument is treated as a char unless hex: or base64: is prefixed");
-    puts("For example `xor sbx 5 Hello` will use 53 ('5') as the xor key. To use the number 5, use `hex:05`");
     puts("Usage:");
     puts("  xor a b");
     puts("More Commands:");
@@ -30,7 +30,7 @@ void xor_usage() {
 }
 
 int perform_xor(char* a, char* b) {
-    int ret = -1;
+    int ret = EXIT_FAILURE;
     struct Arg* left = Argtype_New(a);
     if (left != NULL) {
         struct Arg* right = Argtype_New(b);
@@ -42,7 +42,7 @@ int perform_xor(char* a, char* b) {
                     char* encoded = Hex_Encode(result, left->length);
                     if (encoded != NULL) {
                         printf("%s\n", encoded);
-                        ret = 0;
+                        ret = EXIT_SUCCESS;
                         free(encoded);
                     } else {
                         fputs("Failed to hex encode xor result", stderr);
@@ -62,7 +62,7 @@ int perform_xor(char* a, char* b) {
 }
 
 int perform_sbx(char* a, char* b) {
-    int ret = -1;
+    int ret = EXIT_FAILURE;
     struct Arg* left = Argtype_New(a);
     if (left != NULL) {
         struct Arg* right = Argtype_New(b);
@@ -73,7 +73,7 @@ int perform_sbx(char* a, char* b) {
                     char* encoded = Hex_Encode(result.data, result.length);
                     if (encoded != NULL) {
                         printf("%s\n", encoded);
-                        ret = 0;
+                        ret = EXIT_SUCCESS;
                         free(encoded);
                     }
                     free(result.data);
@@ -93,9 +93,18 @@ int sbx_cli_cmd(int argc, char* argv[]) {
         if (argc > 3) {
             fputs("Too many arguments, xor requires only 2 arguments", stderr);
         } else {
-            xor_usage();
+            puts("Performs a single byte xor operation on the given data");
+            puts("This xors every byte of data with the given key");
+            puts("Key must be 1 byte long. Data can be variable length");
+            puts("When using sbx, the first argument is treated as a char");
+            puts("unless hex: or base64: is prefixed For example");
+            puts("`xor sbx 5 Hello` will use 53 ('5') as the xor key.");
+            puts("To use the number 5, use `hex:05` instead");
+            puts("");
+            puts("Usage:");
+            puts("  sbx key data");
         }
-        return -1;
+        return 1;
     } else {
         return perform_sbx(argv[1], argv[2]);
     }
@@ -103,17 +112,33 @@ int sbx_cli_cmd(int argc, char* argv[]) {
 }
 
 int XorCmd(int argc, char* argv[]) {
-    int result = Subcommand_Run(argv[1], xor_commands, argc - 1, &argv[1]);
-    if (result != SUBCOMMAND_NOT_FOUND) {
-        return result;
-    } else {
-        if (argc == 3) {
-            return perform_xor(argv[1], argv[2]);
-        } else if (argc > 3) {
-            fputs("Too many arguments, xor requires only 2 arguments", stderr);
+    if (argc > 1) {
+        int result = Subcommand_Run(argv[1], xor_commands, argc - 1, &argv[1]);
+        if (result != SUBCOMMAND_NOT_FOUND) {
+            return result;
         } else {
-            xor_usage();
+            if (argc == 3) {
+                return perform_xor(argv[1], argv[2]);
+            } else if (argc > 3) {
+                fputs("Too many arguments, xor requires only 2 arguments", stderr);
+            } else {
+                xor_usage();
+            }
+            return EXIT_FAILURE;
         }
-        return -1;
+    } else {
+        xor_usage();
+        return EXIT_FAILURE;
     }
+}
+
+int sbx_cli_crack(int argc, char* argv[]) {
+    (void)argv;
+    if (argc != 2) {
+        fprintf(stderr, "Expected 1 arg, got %d\n", argc-1);
+        return EXIT_FAILURE;
+    } else {
+        puts("Not implemented yet");
+    }
+    return 0;
 }

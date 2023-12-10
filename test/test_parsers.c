@@ -26,6 +26,7 @@ void test_Hex_Encode() {
     assert(result != NULL);
     assert(strlen(result) == 10);
     assert(strncmp(result, "48656c6c6f", 10) == 0);
+    free(result);
 }
 
 int main() {

@@ -7,6 +7,7 @@ add_executable(cypher
   base64/base64_cli.c
   cli/argtype.c
   cli/subcommand.c
+  operations/xor.c
   parsers/base64.c
   parsers/hex.c
 )
@@ -50,11 +51,16 @@ add_executable(test_parsers
   ../test/test_parsers.c
   parsers/hex.c
 )
+add_executable(test_xor
+  ../test/test_xor.c
+  operations/xor.c
+)
 
 add_test(NAME Subcommands COMMAND test_subcommand)
 add_test(NAME Parsers COMMAND test_parsers)
 add_test(NAME Base64 COMMAND test_base64)
 add_test(NAME Argtype COMMAND test_argtype)
+add_test(NAME xor COMMAND test_xor)
 
 # Eventually will need to add openssl to this.
 # target_link_libraries()

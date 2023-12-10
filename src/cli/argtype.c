@@ -4,7 +4,7 @@
 
 #include "argtype.h"
 #include "parsers/hex.h"
-#include "base64/base64.h"
+#include "parsers/base64.h"
 
 /**
  * Parses hex data into a binary arg

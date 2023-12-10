@@ -6,7 +6,7 @@
 #include <openssl/buffer.h>
 #include <openssl/evp.h>
 
-#include "../src/base64/base64.h"
+#include "../src/parsers/base64.h"
 
 void test_Base64_Decode() {
     char* hello_world = "SGVsbG8sIHdvcmxkIQ==";

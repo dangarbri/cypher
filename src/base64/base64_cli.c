@@ -2,10 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "base64.h"
 #include "base64_cli.h"
 #include "cli/subcommand.h"
 #include "cli/argtype.h"
+#include "parsers/base64.h"
 
 int b64_print_usage(int argc, char* argv[]);
 int b64_print_help(int argc, char* argv[]);

@@ -4,10 +4,10 @@ enable_testing()
 
 add_executable(cypher
   main.c
+  base64/base64_cli.c
   cli/argtype.c
   cli/subcommand.c
-  base64/base64.c
-  base64/base64_cli.c
+  parsers/base64.c
   parsers/hex.c
 )
 target_include_directories(cypher PUBLIC
@@ -27,7 +27,7 @@ add_executable(test_subcommand
 add_executable(test_argtype
   ../test/test_argtype.c
   parsers/hex.c
-  base64/base64.c
+  parsers/base64.c
   cli/argtype.c
 )
 target_include_directories(test_argtype PUBLIC
@@ -40,7 +40,7 @@ target_link_libraries(test_argtype
 
 add_executable(test_base64
   ../test/test_base64.c
-  base64/base64.c
+  parsers/base64.c
 )
 target_link_libraries(test_base64
   LINK_PRIVATE ssl

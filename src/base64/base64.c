@@ -47,14 +47,14 @@ struct Base64Data Base64_Encode(uint8_t* data, size_t length) {
                 result.valid = true;
                 BIO_free(b64);
             } else {
-                fputs("Failed to encode base64 data", stderr);
+                fputs("Failed to encode base64 data\n", stderr);
             }
         } else {
-            fputs("Failled to create base64 encoder", stderr);
+            fputs("Failled to create base64 encoder\n", stderr);
         }
         BIO_free(encoded);
     } else {
-        fputs("Failed to allocate memory for b64 encoded buffer", stderr);
+        fputs("Failed to allocate memory for b64 encoded buffer\n", stderr);
     }
     return result;
 }
@@ -89,19 +89,19 @@ struct Base64Data Base64_Decode(char* data) {
                         result.valid = true;
                     } else {
                         free(decoded);
-                        fputs("Not enough memory for base64 decoded data", stderr);
+                        fputs("Not enough memory for base64 decoded data\n", stderr);
                     }
                 }
             } else {
-                fputs("Failed to allocate memory for base64 decoded data", stderr);
+                fputs("Failed to allocate memory for base64 decoded data\n", stderr);
             }
             BIO_free(b64);
         } else {
-            fputs("Failed to allocate memory for base64 decoder", stderr);
+            fputs("Failed to allocate memory for base64 decoder\n", stderr);
         }
         BIO_free(encoded);
     } else {
-        fputs("Failed to allocate memory for base64 decoding buffer", stderr);
+        fputs("Failed to allocate memory for base64 decoding buffer\n", stderr);
     }
 
     return result;

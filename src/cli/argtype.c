@@ -9,10 +9,10 @@
 /**
  * Parses hex data into a binary arg
  */
-struct BinArg* Argtype_Hex(char* hex) {
+struct Arg* Argtype_Hex(char* hex) {
     struct HexData data = Hex_Decode(hex);
     if (data.valid) {
-        struct BinArg *arg = malloc(sizeof(struct BinArg));
+        struct Arg *arg = malloc(sizeof(struct Arg));
         if (arg != NULL) {
             arg->type = ARGTYPE_BINARY;
             arg->data = data.data;
@@ -25,10 +25,10 @@ struct BinArg* Argtype_Hex(char* hex) {
     return NULL;
 }
 
-struct BinArg* Argtype_Base64(char* base64) {
+struct Arg* Argtype_Base64(char* base64) {
     struct Base64Data decoded = Base64_Decode(base64);
     if (decoded.valid) {
-        struct BinArg *arg = malloc(sizeof(struct BinArg));
+        struct Arg *arg = malloc(sizeof(struct Arg));
         if (arg != NULL) {
             arg->type = ARGTYPE_BINARY;
             arg->data = decoded.data;
@@ -45,7 +45,8 @@ struct Arg* Argtype_String(char* arg) {
     struct Arg* result = malloc(sizeof(struct Arg));
     if (result != NULL) {
         result->type = ARGTYPE_STRING;
-        result->arg = (uint8_t*) arg;
+        result->data = (uint8_t*) arg;
+        result->length = strlen(arg);
         return result;
     }
     return NULL;
@@ -67,9 +68,8 @@ struct Arg* Argtype_New(char* arg) {
 
 void Argtype_Free(struct Arg* arg) {
     if (arg->type == ARGTYPE_BINARY) {
-        struct BinArg* barg = (struct BinArg*) arg;
-        if (barg->data != NULL) {
-            free(barg->data);
+        if (arg->data != NULL) {
+            free(arg->data);
         }
     }
     free(arg);

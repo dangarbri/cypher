@@ -26,18 +26,8 @@ struct Arg {
     /** Type of argument */
     enum ArgType type;
     /** Processed argument data */
-    uint8_t* arg;
-};
-
-/**
- * Extension of struct Arg that contains information about binary data.
- */
-struct BinArg {
-    /** Type of argument */
-    enum ArgType type;
-    /** Processed argument data */
     uint8_t* data;
-    /** Length of the data buffer */
+    /** Length of the input */
     long length;
 };
 

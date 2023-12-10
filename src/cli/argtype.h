@@ -9,34 +9,53 @@
  */
 
 #include <stdint.h>
+#include <stdbool.h>
 
 /**
  * Represents the type of the input argument
  */
 enum ArgType {
     ARGTYPE_STRING,
-    ARGTYPE_HEX,
-    ARGTYPE_BASE64
+    ARGTYPE_BINARY,
 };
 
 /**
  * Argument structure containing arg type and arg type metadata
  */
 struct Arg {
+    /** Type of argument */
     enum ArgType type;
+    /** Processed argument data */
     uint8_t* arg;
 };
 
 /**
+ * Extension of struct Arg that contains information about binary data.
+ */
+struct BinArg {
+    /** Type of argument */
+    enum ArgType type;
+    /** Processed argument data */
+    uint8_t* data;
+    /** Length of the data buffer */
+    long length;
+};
+
+/**
  * Parses the given argument into an arg struct.
- * You are responsible for freeing memory allocated by this function.
+ * Free this data with Argtype_Free
  *
  * If the type is a string, then the returned ptr will be the same as the input.
  * If the type is hex, then arg will be a ptr to the binary data.
  * If the type is base64, then arg will be a ptr to the decoded binary data.
  * @param arg Input argument to check
- * @return parsed arg.
+ * @return parsed arg or NULL on error.
  */
-struct Arg Argtype_Parse(char* arg);
+struct Arg* Argtype_New(char* arg);
+
+/**
+ * Free memory allocated with Argtype_New
+ */
+void Argtype_Free(struct Arg* arg);
 
 #endif

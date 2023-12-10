@@ -21,10 +21,21 @@ add_executable(test_subcommand
   ../test/test_subcommand.c
   cli/subcommand.c
 )
+
 add_executable(test_argtype
   ../test/test_argtype.c
+  parsers/hex.c
+  base64/base64.c
   cli/argtype.c
 )
+target_include_directories(test_argtype PUBLIC
+  ../src
+)
+target_link_libraries(test_argtype
+  LINK_PRIVATE ssl
+  LINK_PRIVATE crypto
+)
+
 add_executable(test_base64
   ../test/test_base64.c
   base64/base64.c

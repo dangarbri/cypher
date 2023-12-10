@@ -51,10 +51,9 @@ void Subcommand_PrintHelp(struct Subcommand commands[]) {
     struct Subcommand* subcmd = &commands[0];
     size_t column_length = Subcommand_GetLongestNameLength(&commands) + 4;
     char format_string[20] = {0};
-    snprintf(format_string, 20, "    %%-%lus %%s", column_length);
+    snprintf(format_string, 20, "  %%-%lus %%s\n", column_length);
     while ((subcmd != NULL) && (subcmd->name != NULL)) {
         printf(format_string, subcmd->name, subcmd->help);
         subcmd += 1;
     }
-    puts("");
 }

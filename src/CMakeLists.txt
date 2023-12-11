@@ -75,12 +75,12 @@ add_test(NAME sbxor COMMAND test_sbxor)
 # Make sure we are using C17
 set_property(TARGET cypher PROPERTY C_STANDARD 17)
 
-# Add debug flags for debug build
-string(APPEND CMAKE_C_FLAGS_DEBUG_INIT " -Og -ggdb3")
-
 # Enable warnings
 if(MSVC)
   target_compile_options(cypher PRIVATE /W4 /WX)
+  add_compile_definitions(cypher PRIVATE _CRT_SECURE_NO_WARNINGS)
 else()
+  # Add debug flags for debug build
+  string(APPEND CMAKE_C_FLAGS_DEBUG_INIT " -Og -ggdb3")
   target_compile_options(cypher PRIVATE -Wall -Wextra -Wpedantic -Werror)
 endif()

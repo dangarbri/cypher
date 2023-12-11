@@ -6,8 +6,13 @@
 
 int main() {
     uint8_t* testbuf = malloc(20);
+    if (testbuf == NULL) {
+		perror("malloc");
+		exit(1);
+	}
     memset(testbuf, 0, 20);
     struct XorData result = SBX_Perform(0x0a, testbuf, 20);
+    (void)result;
     assert(result.data != NULL);
     assert(result.length == 20);
     for (int i = 0; i < 20; i++) {

@@ -2,6 +2,20 @@ cmake_minimum_required(VERSION 3.27)
 project(cypher VERSION 0.0.1 LANGUAGES C)
 enable_testing()
 
+# Enable warnings as errors, define Windows/Other variables
+if(MSVC)
+  add_compile_options(/W4 /WX)
+  add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
+  include_directories("C:\\Program Files\\OpenSSL\\include")
+  link_directories("C:\\Program Files\\OpenSSL\\lib")
+  set(Openssl_LIBRARIES libssl libcrypto)
+else()
+  # Add debug flags for debug build
+  string(APPEND CMAKE_C_FLAGS_DEBUG_INIT " -Og -ggdb3")
+  add_compile_options(-Wall -Wextra -Wpedantic -Werror)
+  set(Openssl_LIBRARIES ssl crypto)
+endif()
+
 add_executable(cypher
   main.c
   cli/argtype.c
@@ -17,8 +31,7 @@ target_include_directories(cypher PUBLIC
   ../src
 )
 target_link_libraries(cypher
-  LINK_PRIVATE ssl
-  LINK_PRIVATE crypto
+  LINK_PRIVATE ${Openssl_LIBRARIES}
 )
 
 # Test Section
@@ -37,8 +50,7 @@ target_include_directories(test_argtype PUBLIC
   ../src
 )
 target_link_libraries(test_argtype
-  LINK_PRIVATE ssl
-  LINK_PRIVATE crypto
+  LINK_PRIVATE ${Openssl_LIBRARIES}
 )
 
 add_executable(test_base64
@@ -46,8 +58,7 @@ add_executable(test_base64
   parsers/base64.c
 )
 target_link_libraries(test_base64
-  LINK_PRIVATE ssl
-  LINK_PRIVATE crypto
+  LINK_PRIVATE ${Openssl_LIBRARIES}
 )
 add_executable(test_parsers
   ../test/test_parsers.c
@@ -74,13 +85,3 @@ add_test(NAME sbxor COMMAND test_sbxor)
 
 # Make sure we are using C17
 set_property(TARGET cypher PROPERTY C_STANDARD 17)
-
-# Enable warnings
-if(MSVC)
-  target_compile_options(cypher PRIVATE /W4 /WX)
-  add_compile_definitions(cypher PRIVATE _CRT_SECURE_NO_WARNINGS)
-else()
-  # Add debug flags for debug build
-  string(APPEND CMAKE_C_FLAGS_DEBUG_INIT " -Og -ggdb3")
-  target_compile_options(cypher PRIVATE -Wall -Wextra -Wpedantic -Werror)
-endif()

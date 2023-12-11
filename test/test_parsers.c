@@ -17,12 +17,14 @@ void test_Hex_Decode() {
 void test_Hex_Decode_Invalid() {
     char* data = "12345678GGGG";
     struct HexData hex = Hex_Decode(data);
+    (void)hex;
     assert(hex.valid == false);
 }
 
 void test_Hex_Encode() {
     char* hello = "Hello";
-    char* result = Hex_Encode(hello, 5);
+    char* result = Hex_Encode((uint8_t*) hello, 5);
+    (void)result;
     assert(result != NULL);
     assert(strlen(result) == 10);
     assert(strncmp(result, "48656c6c6f", 10) == 0);

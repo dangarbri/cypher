@@ -40,14 +40,15 @@ struct Base64Data Base64_Encode(uint8_t* data, size_t length) {
             BIO_push(b64, encoded);
             BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
             // Write data through to encode it
-            if (BIO_write(b64, data, length) >= 0) {
+            if (BIO_write(b64, data, (int) length) >= 0) {
                 BIO_flush(b64);
                 // Extract encoded data from the encoded bio
                 result.length = BIO_claim_data(encoded, &result.data);
                 // The result is not null terminated, so let's fix that
                 // Allocate another buffer that is 1 byte larger than the length for space for the null byte.
-                result.data = realloc(result.data, result.length + 1);
-                if (result.data != NULL) {
+                uint8_t* new_ptr = realloc(result.data, result.length + 1);
+                if (new_ptr != NULL) {
+                    result.data = new_ptr;
                     result.data[result.length] = '\0';
                     result.valid = true;
                 } else {
@@ -79,7 +80,7 @@ struct Base64Data Base64_Decode(char* data) {
     };
     size_t length = strlen(data);
     // Create a BIO around the base64 encoded data
-    BIO* encoded = BIO_new_mem_buf(data, length);
+    BIO* encoded = BIO_new_mem_buf(data, (int) length);
     if (encoded != NULL) {
         // Instantiate base64 decoder
         BIO* b64 = BIO_new(BIO_f_base64());
@@ -91,7 +92,7 @@ struct Base64Data Base64_Decode(char* data) {
             // Allocate enough bytes to handle the output. base64 is pretty close to 1 to 1, excluding padding.
             uint8_t* decoded = malloc(length);
             if (decoded != NULL) {
-                int bytes_returned = BIO_read(b64, decoded, length);
+                int bytes_returned = BIO_read(b64, decoded, (int) length);
                 if (bytes_returned != 0) {
                     // Resize final buffer to size of data returned
                     uint8_t* right_size_ptr = realloc(decoded, bytes_returned);

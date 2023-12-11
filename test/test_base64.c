@@ -23,7 +23,7 @@ void test_Base64_Encode() {
     char* hello_world = "Hello, world!";
     char* expected_result = "SGVsbG8sIHdvcmxkIQ==";
     size_t length = strlen(expected_result);
-    struct Base64Data result = Base64_Encode(hello_world, strlen(hello_world));
+    struct Base64Data result = Base64_Encode((uint8_t*) hello_world, strlen(hello_world));
     char* encoded_str = (char*) result.data;
     assert(result.length == length);
     assert(strncmp(expected_result, encoded_str, length) == 0);

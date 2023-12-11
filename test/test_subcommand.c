@@ -3,11 +3,16 @@
 #include "../src/cli/subcommand.h"
 
 int beepboop(int argc, char** argv) {
+    (void)argc;
+    (void)argv;
     return 10;
 }
 
 int dummy_subcommand(int argc, char** argv) {
+    (void)argc;
+    (void)argv;
     char* expected_argv = "hello";
+    (void)expected_argv;
     assert(strncmp(expected_argv, argv[0], strlen(expected_argv)) == 0);
     return 99;
 }

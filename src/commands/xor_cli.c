@@ -20,12 +20,16 @@ struct Subcommand xor_commands[] = {
 };
 
 void xor_usage() {
-    puts("The xor command allows you to xor items on the command line");
-    puts("The output is printed as a hex string");
-    puts("Inputs can be prefixed with 'hex:' or 'base64': to xor binary data on the cli");
     puts("Usage:");
     puts("  xor a b");
-    puts("More Commands:");
+    puts("  xor hex:deadbeef four");
+    puts("  xor base64:aGVsbG8= hello");
+    puts("");
+    puts("The xor command allows you to xor items on the command line");
+    puts("Both arguments must be the same byte length after decoding.");
+    puts("The output is printed as a string of hex characters");
+    puts("");
+    puts("More subcommands:");
     Subcommand_PrintHelp(xor_commands);
 }
 
@@ -93,16 +97,23 @@ int sbx_cli_cmd(int argc, char* argv[]) {
         if (argc > 3) {
             fputs("Too many arguments, xor requires only 2 arguments", stderr);
         } else {
-            puts("Performs a single byte xor operation on the given data");
-            puts("This xors every byte of data with the given key");
-            puts("Key must be 1 byte long. Data can be variable length");
+            puts("Usage:");
+            puts("  sbx key data");
+            puts("  sbx hex:05 'hello world'");
+            puts("");
+            puts("Arguments:");
+            puts("  key     1 byte key to xor with the message");
+            puts("  data    Each byte in data will be xor'd with the key byte");
+            puts("");
+            puts("A single byte xor is not secure. There are only");
+            puts("255 possible ciphertexts for a given plaintext.");
+            puts("If you believe you have a single byte xor cipher,");
+            puts("you can use the cracksbx utility to decode the message.");
+            puts("");
             puts("When using sbx, the first argument is treated as a char");
             puts("unless hex: or base64: is prefixed For example");
             puts("`xor sbx 5 Hello` will use 53 ('5') as the xor key.");
             puts("To use the number 5, use `hex:05` instead");
-            puts("");
-            puts("Usage:");
-            puts("  sbx key data");
         }
         return 1;
     } else {
@@ -134,16 +145,16 @@ int XorCmd(int argc, char* argv[]) {
 int sbx_cli_crack(int argc, char* argv[]) {
     (void)argv;
     if (argc != 2) {
-        puts("cracksbx will crack a single byte xor cipher.");
-        puts("There are only 255 possible permutations of a single byte xor cipher");
-        puts("cracksbx will analyze each permutation and perform");
-        puts("frequency analysis on the results to choose the");
-        puts("permutation which seems the most like english plaintext");
-        puts("Currently only the english language is supported");
-        puts("Pull requests to support other languages would be nice");
-        puts("");
         puts("Usage:");
         puts("  cracksbx ciphertext");
+        puts("");
+        puts("cracksbx will crack a single byte xor cipher.");
+        puts("There are only 255 possible ciphertexts for a message");
+        puts("that has been 'encrypted' with this method.");
+        puts("cracksbx will brute force the cipher and perform");
+        puts("frequency analysis on the results to choose the");
+        puts("plaintext which seems the most like english plaintext");
+        puts("Pull requests to support other languages are encouraged");
         return EXIT_FAILURE;
     } else {
         puts("Not implemented yet");

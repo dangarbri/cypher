@@ -20,7 +20,7 @@ int dummy_subcommand(int argc, char** argv) {
 struct Subcommand commands[] = {
     {"beepboop", "This is the beepboop command", beepboop},
     {"dummy", "dummy subcommand for testing", dummy_subcommand},
-    NULL
+    {NULL}
 };
 
 void test_Subcommand_Run() {

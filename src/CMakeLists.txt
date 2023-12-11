@@ -27,7 +27,7 @@ add_executable(cypher
   parsers/base64.c
   parsers/hex.c
 )
-target_include_directories(cypher PUBLIC
+include_directories(
   ../src
 )
 target_link_libraries(cypher
@@ -76,6 +76,11 @@ add_executable(test_buffer
   ../test/test_buffer.c
   types/buffer.c
 )
+add_executable(test_english
+  ../test/test_english.c
+  analyzers/english.c
+  types/buffer.c
+)
 
 add_test(NAME Subcommands COMMAND test_subcommand)
 add_test(NAME Parsers COMMAND test_parsers)
@@ -84,6 +89,7 @@ add_test(NAME Argtype COMMAND test_argtype)
 add_test(NAME xor COMMAND test_xor)
 add_test(NAME sbxor COMMAND test_sbxor)
 add_test(NAME buffer COMMAND test_buffer)
+add_test(NAME EnglishAnalyzer COMMAND test_english)
 
 # Eventually will need to add openssl to this.
 # target_link_libraries()

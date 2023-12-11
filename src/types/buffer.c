@@ -30,3 +30,7 @@ void Buffer_Free(struct Buffer* buffer) {
         free(buffer);
     }
 }
+
+bool Buffer_IsValid(struct Buffer* buffer) {
+    return (buffer != NULL) && (buffer->data != NULL) && (buffer->length != 0);
+}

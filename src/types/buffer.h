@@ -1,6 +1,7 @@
 #ifndef _APP_TYPES_H_
 #define _APP_TYPES_H_
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -30,5 +31,10 @@ struct Buffer* Buffer_New(size_t size);
  * @param buffer Buffer to free
  */
 void Buffer_Free(struct Buffer* buffer);
+
+/**
+ * Checks if a buffer is valid and safe to use
+ */
+bool Buffer_IsValid(struct Buffer* buffer);
 
 #endif

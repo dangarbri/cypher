@@ -94,5 +94,4 @@ int Base64(int argc, char** argv) {
         }
         return result;
     }
-    return 0;
 }

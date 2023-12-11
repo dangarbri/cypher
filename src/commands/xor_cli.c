@@ -52,7 +52,7 @@ int perform_xor(char* a, char* b) {
                     perror("xor_cli: ");
                 }
             } else {
-                fprintf(stderr, "Left and right arguments are not the same length (%ld != %ld)\n", left->length, right->length);
+                fprintf(stderr, "Left and right arguments are not the same length (%zu != %zu)\n", left->length, right->length);
             }
             Argtype_Free(right);
         }
@@ -79,7 +79,7 @@ int perform_sbx(char* a, char* b) {
                     free(result.data);
                 }
             } else {
-                fprintf(stderr, "Left argument must be 1 byte long. Got %ld bytes\n", left->length);
+                fprintf(stderr, "Left argument must be 1 byte long. Got %zu bytes\n", left->length);
             }
             Argtype_Free(right);
         }
@@ -108,7 +108,6 @@ int sbx_cli_cmd(int argc, char* argv[]) {
     } else {
         return perform_sbx(argv[1], argv[2]);
     }
-    return 0;
 }
 
 int XorCmd(int argc, char* argv[]) {

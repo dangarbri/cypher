@@ -58,7 +58,7 @@ struct HexData Hex_Decode(char* hex) {
         size_t bytes_left = bytelen - bytes_copied;
         size_t bytes_to_copy = typesize < bytes_left ? typesize : bytes_left;
         // Copy byte by byte into data
-        for (int j = bytes_to_copy; j > 0; j--) {
+        for (size_t j = bytes_to_copy; j > 0; j--) {
             long long tmp = value >> ((j-1) * 8);
             data[bytes_copied + bytes_to_copy - j] = tmp & 0xFF;
         }

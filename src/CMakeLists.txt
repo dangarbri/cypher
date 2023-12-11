@@ -72,6 +72,10 @@ add_executable(test_sbxor
   ../test/test_sbxor.c
   operations/sbxor.c
 )
+add_executable(test_buffer
+  ../test/test_buffer.c
+  types/buffer.c
+)
 
 add_test(NAME Subcommands COMMAND test_subcommand)
 add_test(NAME Parsers COMMAND test_parsers)
@@ -79,6 +83,7 @@ add_test(NAME Base64 COMMAND test_base64)
 add_test(NAME Argtype COMMAND test_argtype)
 add_test(NAME xor COMMAND test_xor)
 add_test(NAME sbxor COMMAND test_sbxor)
+add_test(NAME buffer COMMAND test_buffer)
 
 # Eventually will need to add openssl to this.
 # target_link_libraries()

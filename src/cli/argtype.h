@@ -28,7 +28,7 @@ struct Arg {
     /** Processed argument data */
     uint8_t* data;
     /** Length of the input */
-    long length;
+    size_t length;
 };
 
 /**

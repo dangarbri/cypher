@@ -55,16 +55,16 @@ float English_Analyzer(struct Buffer* buffer) {
 
     // Apply points if data is all alphanumeric/symbolic.
     if (buffer->length == histogram.ascii_count) {
-        score += 0.10;
+        score += 0.10f;
     } else if (histogram.ascii_count > ((buffer->length * 7) / 10)) {
-        score += 0.05;
+        score += 0.05f;
     }
     if (histogram.symbol_count < ((buffer->length * 10) / 100)) {
-        score += 0.10;
+        score += 0.10f;
     }
 
     if (histogram.lower_count > histogram.upper_count) {
-        score += 0.10;
+        score += 0.10f;
     }
 
 
@@ -74,7 +74,7 @@ float English_Analyzer(struct Buffer* buffer) {
     // Find the top 12 characters
     for (int i = 0; i < 256; i++) {
         uint8_t byte = (uint8_t) i;
-        uint8_t count = histogram.counters[i];
+        uint64_t count = histogram.counters[i];
         for (int j = 0; j < 12; j++) {
             bool is_larger = count > max_counts[j];
             // index 0 has the biggest max, set it unconditionally
@@ -96,7 +96,7 @@ float English_Analyzer(struct Buffer* buffer) {
     // Score based on these chars
     for (int i = 0; i < 12; i++) {
         if (strchr(hf_chars, max_bytes[i]) != NULL) {
-            score += .075;
+            score += .075f;
         }
     }
 

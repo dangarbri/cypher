@@ -86,7 +86,8 @@ thrd_t ThreadPool_SubmitQueue(struct ThreadPool* pool, struct ThreadQueue* queue
     struct ThreadPoolManagerArgs* args = malloc(sizeof(struct ThreadPoolManagerArgs));
     if (args == NULL) {
         perror("ThreadPool_SubmitQueue");
-        return 0;
+        thrd_t result = { 0 };
+        return result;
     }
 
     args->pool = pool;
@@ -96,7 +97,8 @@ thrd_t ThreadPool_SubmitQueue(struct ThreadPool* pool, struct ThreadQueue* queue
     if (result != thrd_success) {
         fputs("Failed to start thread pool manager\n", stderr);
         free(args);
-        return 0;
+        thrd_t badthread = { 0 };
+        return badthread;
     }
 
     return thread;

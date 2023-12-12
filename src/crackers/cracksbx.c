@@ -32,7 +32,7 @@ struct PotentialKeys CrackSBX_Evaluate(int* scores);
 struct PotentialKeys CrackSBX_SingleThread(struct Buffer* buf, Analyzer analyzer, bool verbose) {
     int scores[256] = {0};
     for (int i = 0; i < 256; i++) {
-        float result = CrackSBX_TestKey(buf, i, analyzer, verbose);
+        float result = CrackSBX_TestKey(buf, (uint8_t) i, analyzer, verbose);
         scores[i] = (int) (result * 1000);
     }
     return CrackSBX_Evaluate(&scores[0]);
@@ -93,7 +93,7 @@ struct PotentialKeys CrackSBX_Evaluate(int* scores) {
                         results.scores[k] = results.scores[k-1];
                         results.keys[k] = results.keys[k-1];
                     }
-                results.scores[j] = count;
+                results.scores[j] = (float) count;
                 results.keys[j] = byte;
             }
         }

@@ -16,3 +16,31 @@ I want this library to be portable and efficient, so I try to use only standard 
 Unfortunately I'm not brave enough or knowledgable enough to use `-nostdlib` like busybox, which is portable enough to run on the air we breathe, but I assume using only the standard library should allow it to run at least least Mac, Linux, and Windows, or any other platform that has a C17 compiler.
 
 I chose cmake as the build system. I considered autotools, but while autotools aims to be portable, it's generally not supported by windows due to the required bash scripts. I know there are projects like mingw and cygwin which aim to provide UNIX-like functionality for windows, but cmake is much less of a hassle to set up, and it will generate a visual studio solution for compilation on windows, and an xcode configuration for Mac.
+
+## Compiling
+
+First ensure your system meets the following requirements:
+- OpenSSL v3 for handling many crypto operations and base64 encoding.
+- `threads.h` implementation. Part of the C11 standard
+
+Then compile with:
+
+```shell
+mkdir build && cd build
+cmake ../src
+cmake --build .
+```
+
+The above snippet works on all platforms, go cmake!
+
+#### Operating System Notes
+
+For Linux:
+- Use your package manager to install gcc, openssl, and cmake, then build.
+
+For Windows:
+- You must install visual studio and install the "Desktop Development with C++" package.
+- Visual Studio 17.8 (circa 2023) is required for `threads.h` implementation.
+
+For Mac:
+- I haven't tested on mac yet, try it out and report back.

@@ -1,5 +1,10 @@
-#ifndef _THREADS_H
-#define _THREADS_H
+#ifdef _MSC_VER
+// Visual Studio 2022 Version 17.8 claims to support the C11 threads standard
+// but they did not ship a header file with it.
+// However, the functions exist and can be linked to, so this file exposes
+// some of the available features.
+#ifndef _THREADS_H_
+#define _THREADS_H_
 
 #include <time.h>
 
@@ -24,4 +29,8 @@ extern int __cdecl thrd_create(thrd_t*, thrd_start_t, void*);
 extern int __cdecl thrd_detach(thrd_t);
 extern int __cdecl thrd_join(thrd_t, int*);
 
-#endif
+#endif // _THREADS_H_
+
+#else // _MSC_VER
+#include <threads.h>
+#endif // _MSC_VER

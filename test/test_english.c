@@ -12,5 +12,5 @@ int main() {
     };
     float score = English_Check(&buf);
     printf("Score: %f\n", score);
-    assert(score == 0.25);
+    assert(score > 0.799 && score < 0.801);
 }

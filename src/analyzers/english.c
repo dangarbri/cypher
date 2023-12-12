@@ -19,9 +19,11 @@ struct FrequencyHistogram {
  * Tries to determine if data pointed to by buffer is english plaintext
  * The heuristics used are as follows:
  *   (1 point = 0.01 or 1%)
- *   - 5 points for each high frequency byte which is one of ETAOIN SHRDLU
+ *   - 5 points for each top 12 occurring byte high frequency byte which is one of ETAOIN SHRDLU
  *   - 10 points if 100% of characters are alphanumeric + symbols or line feeds
- *   - 7.5 points (instead of 10) if 70% of characters are alphanumeric + symbols or line feeds
+ *   - 5 points (instead of 10) if 70% of characters are alphanumeric + symbols or line feeds
+ *   - 10 points if symbols are < 10% of all bytes
+ *   - 10 points if a majority of symbols are lower case
  */
 float English_Analyzer(struct Buffer* buffer) {
     // Safety check.
@@ -54,21 +56,26 @@ float English_Analyzer(struct Buffer* buffer) {
     }
 
     // Apply points if data is all alphanumeric/symbolic.
+    // 10 points
     if (buffer->length == histogram.ascii_count) {
         score += 0.10f;
     } else if (histogram.ascii_count > ((buffer->length * 7) / 10)) {
         score += 0.05f;
     }
+
+    // 10 points
     if (histogram.symbol_count < ((buffer->length * 10) / 100)) {
         score += 0.10f;
     }
 
+    // 10 points
     if (histogram.lower_count > histogram.upper_count) {
         score += 0.10f;
     }
 
 
     // Frequency analysis check.
+    // 5 points per high frequency letter
     uint8_t max_bytes[12] = {0};
     uint64_t max_counts[12] = {0};
     // Find the top 12 characters
@@ -96,7 +103,7 @@ float English_Analyzer(struct Buffer* buffer) {
     // Score based on these chars
     for (int i = 0; i < 12; i++) {
         if (strchr(hf_chars, max_bytes[i]) != NULL) {
-            score += .075f;
+            score += .05f;
         }
     }
 

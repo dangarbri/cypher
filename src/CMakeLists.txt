@@ -89,6 +89,10 @@ add_executable(test_cracksbx
   operations/sbxor.c
   types/buffer.c
 )
+add_executable(test_threadpool
+  ../test/test_threadpool.c
+  threading/pool.c
+)
 
 add_test(NAME Subcommands COMMAND test_subcommand)
 add_test(NAME Parsers COMMAND test_parsers)
@@ -99,6 +103,7 @@ add_test(NAME sbxor COMMAND test_sbxor)
 add_test(NAME buffer COMMAND test_buffer)
 add_test(NAME EnglishAnalyzer COMMAND test_english)
 add_test(NAME CrackSBX COMMAND test_cracksbx)
+add_test(NAME ThreadPool COMMAND test_threadpool)
 
 # Eventually will need to add openssl to this.
 # target_link_libraries()

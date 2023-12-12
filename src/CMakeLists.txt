@@ -19,6 +19,7 @@ endif()
 add_executable(cypher
   main.c
   analyzers/english.c
+  analyzers/sbx.c
   cli/argtype.c
   cli/subcommand.c
   crackers/cracksbx.c

@@ -25,6 +25,7 @@ add_executable(cypher
   crackers/cracksbx.c
   commands/analyze.c
   commands/base64_cli.c
+  commands/crack.c
   commands/xor_cli.c
   operations/sbxor.c
   operations/xor.c

@@ -36,7 +36,7 @@ void AnalyzeHelp() {
          "Means that the the single byte xor analyzer scored the input\n"
          "at 0.7. As this value is closer to 1, it suggests that you would\n"
          "likely find some plaintext by cracking the cipher with the\n"
-         "cracksbx utility.");
+         "crack utility.");
 }
 
 void AnalyzeUsage() {

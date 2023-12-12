@@ -5,7 +5,14 @@
 struct FrequencyHistogram {
     // Allocate space for 0 thru 0xFF
     uint64_t counters[256];
+    /** Number of letter/symbol glyphs (between 0x20 and 0x7F)*/
     uint64_t ascii_count;
+    /** Number of lower case letters */
+    uint64_t upper_count;
+    /** Number of lower case letters */
+    uint64_t lower_count;
+    /** Number of symbols in the text */
+    uint64_t symbol_count;
 };
 
 /**
@@ -35,15 +42,31 @@ float English_Check(struct Buffer* buffer) {
         // accented characters.
         if ((byte >= ' ' && byte <= '~') || (byte == '\n') || (byte == '\r')) {
             histogram.ascii_count += 1;
+            if ((byte >= 'a' && byte <= 'z')) {
+                histogram.lower_count += 1;
+            } else if ((byte >= 'A' && byte <= 'Z')) {
+                histogram.upper_count += 1;
+            }
+            if (((byte >= '!') && (byte <= '/')) || ((byte >= ':') && (byte <= '@')) || ((byte >= '[' && byte <= '`')) || (byte >= '{' && byte <= '~')) {
+                histogram.symbol_count += 1;
+            }
         }
     }
 
     // Apply points if data is all alphanumeric/symbolic.
     if (buffer->length == histogram.ascii_count) {
         score += 0.10;
-    } else if (buffer->length > ((histogram.ascii_count * 7) / 10)) {
+    } else if (histogram.ascii_count > ((buffer->length * 7) / 10)) {
         score += 0.05;
     }
+    if (histogram.symbol_count < ((buffer->length * 10) / 100)) {
+        score += 0.10;
+    }
+
+    if (histogram.lower_count > histogram.upper_count) {
+        score += 0.10;
+    }
+
 
     // Frequency analysis check.
     uint8_t max_bytes[12] = {0};
@@ -69,7 +92,7 @@ float English_Check(struct Buffer* buffer) {
     }
 
     // High frequency characters
-    char* hf_chars = "ETAOIN SHRDLU";
+    char* hf_chars = "ETAOIN SHRDLUetaoinshrdlu";
     // Score based on these chars
     for (int i = 0; i < 12; i++) {
         if (strchr(hf_chars, max_bytes[i]) != NULL) {

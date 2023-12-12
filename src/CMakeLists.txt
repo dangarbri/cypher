@@ -81,6 +81,14 @@ add_executable(test_english
   analyzers/english.c
   types/buffer.c
 )
+add_executable(test_cracksbx
+  ../test/test_cracksbx.c
+  parsers/hex.c
+  crackers/cracksbx.c
+  analyzers/english.c
+  operations/sbxor.c
+  types/buffer.c
+)
 
 add_test(NAME Subcommands COMMAND test_subcommand)
 add_test(NAME Parsers COMMAND test_parsers)
@@ -90,6 +98,7 @@ add_test(NAME xor COMMAND test_xor)
 add_test(NAME sbxor COMMAND test_sbxor)
 add_test(NAME buffer COMMAND test_buffer)
 add_test(NAME EnglishAnalyzer COMMAND test_english)
+add_test(NAME CrackSBX COMMAND test_cracksbx)
 
 # Eventually will need to add openssl to this.
 # target_link_libraries()

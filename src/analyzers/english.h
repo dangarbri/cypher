@@ -1,7 +1,7 @@
 #ifndef _ENGLISH_H_
 #define _ENGLISH_H_
 
-#include "frequency.h"
+#include "analyzer.h"
 
 /**
  * This analyzes a buffer to determine if contains english text.

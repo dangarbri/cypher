@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <threads.h>
 #include "operations/sbxor.h"
 #include "cracksbx.h"
 

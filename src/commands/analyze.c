@@ -55,13 +55,9 @@ int Analyze(char* message) {
     int result = EXIT_FAILURE;
     struct Arg* arg = Argtype_New(message);
     if (arg != NULL) {
-        struct Buffer buf = {
-            .data = arg->data,
-            .length = arg->length
-        };
         struct RegisteredAnalyzer* analyzer = &RegisteredAnalyzers[0];
         while (analyzer->fn != NULL) {
-            float score = analyzer->fn(&buf);
+            float score = analyzer->fn(&arg->buffer);
             printf("%-15s | %.04f\n", analyzer->name, score);
             analyzer += 1;
         }

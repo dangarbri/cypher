@@ -38,11 +38,11 @@ int perform_xor(char* a, char* b) {
     if (left != NULL) {
         struct Arg* right = Argtype_New(b);
         if (right != NULL) {
-            if (left->length == right->length) {
-                uint8_t* result = malloc(left->length);
+            if (left->buffer.length == right->buffer.length) {
+                uint8_t* result = malloc(left->buffer.length);
                 if (result != NULL) {
-                    xor(result, left->data, right->data, left->length);
-                    char* encoded = Hex_Encode(result, left->length);
+                    xor(result, left->buffer.data, right->buffer.data, left->buffer.length);
+                    char* encoded = Hex_Encode(result, left->buffer.length);
                     if (encoded != NULL) {
                         printf("%s\n", encoded);
                         ret = EXIT_SUCCESS;
@@ -55,7 +55,7 @@ int perform_xor(char* a, char* b) {
                     perror("xor_cli: ");
                 }
             } else {
-                fprintf(stderr, "Left and right arguments are not the same length (%zu != %zu)\n", left->length, right->length);
+                fprintf(stderr, "Left and right arguments are not the same length (%zu != %zu)\n", left->buffer.length, right->buffer.length);
             }
             Argtype_Free(right);
         }
@@ -70,8 +70,8 @@ int perform_sbx(char* a, char* b) {
     if (left != NULL) {
         struct Arg* right = Argtype_New(b);
         if (right != NULL) {
-            if (left->length == 1) {
-                struct XorData result = sb_xor(*left->data, right->data, right->length);
+            if (left->buffer.length == 1) {
+                struct XorData result = sb_xor(*left->buffer.data, right->buffer.data, right->buffer.length);
                 if (result.data != NULL) {
                     char* encoded = Hex_Encode(result.data, result.length);
                     if (encoded != NULL) {
@@ -82,7 +82,7 @@ int perform_sbx(char* a, char* b) {
                     free(result.data);
                 }
             } else {
-                fprintf(stderr, "Left argument must be 1 byte long. Got %zu bytes\n", left->length);
+                fprintf(stderr, "Left argument must be 1 byte long. Got %zu bytes\n", left->buffer.length);
             }
             Argtype_Free(right);
         }

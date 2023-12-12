@@ -9,7 +9,7 @@ void test_Argtype_Parse() {
     struct Arg* arg = Argtype_New(basic);
     assert(arg != NULL);
     assert(arg->type == ARGTYPE_STRING);
-    assert(basic == (char*) arg->data);
+    assert(basic == (char*) arg->buffer.data);
     Argtype_Free(arg);
 }
 
@@ -18,9 +18,9 @@ void test_Argtype_Parse_Hex() {
     struct Arg* arg = Argtype_New(hex);
     assert(arg != NULL);
     assert(arg->type == ARGTYPE_BINARY);
-    assert(arg->length == 2);
-    assert(arg->data[0] == 0x12);
-    assert(arg->data[1] == 0x34);
+    assert(arg->buffer.length == 2);
+    assert(arg->buffer.data[0] == 0x12);
+    assert(arg->buffer.data[1] == 0x34);
     Argtype_Free(arg);
 }
 
@@ -30,8 +30,8 @@ void test_Argtype_Parse_Base64() {
     struct Arg* arg = (struct Arg*) Argtype_New(base64);
     assert(arg != NULL);
     assert(arg->type == ARGTYPE_BINARY);
-    assert(arg->length == 5);
-    assert(strncmp((char*) arg->data, "Hello", 5) == 0);
+    assert(arg->buffer.length == 5);
+    assert(strncmp((char*) arg->buffer.data, "Hello", 5) == 0);
     Argtype_Free((struct Arg*) arg);
 }
 

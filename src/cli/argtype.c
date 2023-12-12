@@ -15,8 +15,8 @@ struct Arg* Argtype_Hex(char* hex) {
         struct Arg *arg = malloc(sizeof(struct Arg));
         if (arg != NULL) {
             arg->type = ARGTYPE_BINARY;
-            arg->data = data.data;
-            arg->length = data.length;
+            arg->buffer.data = data.data;
+            arg->buffer.length = data.length;
             return arg;
         } else {
             perror("Argtype_Hex: ");
@@ -33,8 +33,8 @@ struct Arg* Argtype_Base64(char* base64) {
         struct Arg *arg = malloc(sizeof(struct Arg));
         if (arg != NULL) {
             arg->type = ARGTYPE_BINARY;
-            arg->data = decoded.data;
-            arg->length = decoded.length;
+            arg->buffer.data = decoded.data;
+            arg->buffer.length = decoded.length;
             return arg;
         } else {
             perror("Argtype_Base64: ");
@@ -49,8 +49,8 @@ struct Arg* Argtype_String(char* arg) {
     struct Arg* result = malloc(sizeof(struct Arg));
     if (result != NULL) {
         result->type = ARGTYPE_STRING;
-        result->data = (uint8_t*) arg;
-        result->length = strlen(arg);
+        result->buffer.data = (uint8_t*) arg;
+        result->buffer.length = strlen(arg);
         return result;
     } else {
         perror("Argtype_String: ");
@@ -74,8 +74,8 @@ struct Arg* Argtype_New(char* arg) {
 
 void Argtype_Free(struct Arg* arg) {
     if (arg->type == ARGTYPE_BINARY) {
-        if (arg->data != NULL) {
-            free(arg->data);
+        if (arg->buffer.data != NULL) {
+            free(arg->buffer.data);
         }
     }
     free(arg);

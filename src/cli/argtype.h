@@ -11,6 +11,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "types/buffer.h"
+
 /**
  * Represents the type of the input argument
  */
@@ -26,9 +28,7 @@ struct Arg {
     /** Type of argument */
     enum ArgType type;
     /** Processed argument data */
-    uint8_t* data;
-    /** Length of the input */
-    size_t length;
+    struct Buffer buffer;
 };
 
 /**

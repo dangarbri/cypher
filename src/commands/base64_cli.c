@@ -49,14 +49,8 @@ int b64_encode(int argc, char** argv) {
         fputs("Missing argument\n", stderr);
         return -1;
     }
-    char* message_to_encode = argv[1];
-    size_t length = strlen(message_to_encode);
-    struct Arg* arg = Argtype_New(message_to_encode);
-    if (arg->type == ARGTYPE_BINARY) {
-        message_to_encode = (char*) arg->data;
-        length = arg->length;
-    }
-    struct Base64Data data = Base64_Encode((uint8_t*) message_to_encode, length);
+    struct Arg* arg = Argtype_New(argv[1]);
+    struct Base64Data data = Base64_Encode((uint8_t*) arg->buffer.data, arg->buffer.length);
     Argtype_Free(arg);
     if (!data.valid) {
         fputs("Sorry, I couldn't encode that!\n", stderr);

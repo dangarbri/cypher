@@ -23,7 +23,7 @@ struct FrequencyHistogram {
  *   - 10 points if 100% of characters are alphanumeric + symbols or line feeds
  *   - 7.5 points (instead of 10) if 70% of characters are alphanumeric + symbols or line feeds
  */
-float English_Check(struct Buffer* buffer) {
+float English_Analyzer(struct Buffer* buffer) {
     // Safety check.
     if (!Buffer_IsValid(buffer)) {
         return 0;

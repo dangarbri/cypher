@@ -18,8 +18,10 @@ endif()
 
 add_executable(cypher
   main.c
+  analyzers/english.c
   cli/argtype.c
   cli/subcommand.c
+  crackers/cracksbx.c
   commands/base64_cli.c
   commands/xor_cli.c
   operations/sbxor.c
@@ -27,6 +29,7 @@ add_executable(cypher
   parsers/base64.c
   parsers/hex.c
   threading/pool.c
+  types/buffer.c
 )
 include_directories(
   ../src

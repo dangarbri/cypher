@@ -16,7 +16,7 @@ int main() {
         .data = blob.data,
         .length = blob.length
     };
-    struct PotentialKeys keys = CrackSBX(&buf, English_Check, false);
+    struct PotentialKeys keys = CrackSBX(&buf, English_Analyzer, false);
     printf("Potential Keys:\n");
     for (int i = 0; i < 5; i++) {
         struct XorData pt = SBX_Perform(keys.keys[i], buf.data, buf.length);

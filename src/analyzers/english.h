@@ -9,6 +9,6 @@
  * @return Score of how likely it is that this buffer has english plaintext
  *         TODO: Add scoring details
  */
-float English_Check(struct Buffer* buffer);
+float English_Analyzer(struct Buffer* buffer);
 
 #endif

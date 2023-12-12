@@ -10,7 +10,7 @@ int main() {
         .data = (uint8_t*) message,
         .length = strlen(message)
     };
-    float score = English_Check(&buf);
+    float score = English_Analyzer(&buf);
     printf("Score: %f\n", score);
     assert(score > 0.799 && score < 0.801);
 }

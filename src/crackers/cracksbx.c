@@ -5,6 +5,10 @@
 #include "operations/sbxor.h"
 #include "cracksbx.h"
 
+// Force using the single threaded implementation
+// It's faster for this attack...
+#define __STDC_NO_THREADS__
+
 /**
  * Tests the likelihood that key is the right one for this buffer.
  * @param key Key to test
@@ -22,7 +26,25 @@ float CrackSBX_TestKey(struct Buffer* buffer, uint8_t key, Analyzer analyzer, bo
  */
 void CrackSBX_LogResult(struct XorData* result, uint8_t key);
 
+/**
+ * Evaluates the given scores and returns the top 5 as potential keys
+ * @param scores pointer to array of 256 scores, one for each key
+ * @return top 5 keys
+ */
+struct PotentialKeys CrackSBX_Evaluate(int* scores);
+
+
 #ifdef __STDC_NO_THREADS__
+
+struct PotentialKeys CrackSBX_SingleThread(struct Buffer* buf, Analyzer analyzer, bool verbose) {
+    int scores[256] = {0};
+    for (int i = 0; i < 256; i++) {
+        float result = CrackSBX_TestKey(buf, i, analyzer, verbose);
+        scores[i] = (int) (result * 1000);
+    }
+    return CrackSBX_Evaluate(&scores[0]);
+}
+
 #else
 
 struct ThreadArgs {
@@ -39,7 +61,6 @@ int CrackSBX_Thread(void* data) {
 }
 
 struct PotentialKeys CrackSBX_Multithreaded(struct Buffer* buf, Analyzer analyzer, bool verbose) {
-    struct PotentialKeys keys = {0};
     // Create threads to test keys from 0 to 255
     thrd_t threads[256] = {0};
     int scores[256] = {0};
@@ -64,42 +85,15 @@ struct PotentialKeys CrackSBX_Multithreaded(struct Buffer* buf, Analyzer analyze
             }
         }
     }
-    // Find the top 5 values
-    uint8_t max_bytes[5] = {0};
-    int max_counts[5] = {0};
-    // Find the top 12 characters
-    for (int i = 0; i < 256; i++) {
-        uint8_t byte = (uint8_t) i;
-        int count = scores[i];
-        for (int j = 0; j < 5; j++) {
-            bool is_larger = count > max_counts[j];
-            // index 0 has the biggest max, set it unconditionally
-            if (((j == 0) && is_larger) ||
-                (is_larger && (count <= max_counts[j-1]) && (byte != max_bytes[j-1]))) {
-                    // Shift the array to make space for this new max value
-                    for(int k = 4; k > j; k--) {
-                        max_counts[k] = max_counts[k-1];
-                        max_bytes[k] = max_bytes[k-1];
-                    }
-                max_counts[j] = count;
-                max_bytes[j] = byte;
-            }
-        }
-    }
 
-    for (int i = 0; i < 5; i++) {
-        keys.keys[i] = max_bytes[i];
-        keys.scores[i] = (float) max_counts[i];
-    }
-    return keys;
+    return CrackSBX_Evaluate(&scores[0]);
 }
 #endif
 
 struct PotentialKeys CrackSBX(struct Buffer* buf, Analyzer analyzer, bool verbose) {
     #ifdef __STDC_NO_THREADS__
     // Single threaded implementation
-    struct PotentialKeys keys;
-    return keys;
+    return CrackSBX_SingleThread(buf, analyzer, verbose);
     #else
     // Multithreaded implementation
     // I know there's only 255 possibilities so a single threaded solution be fast enough,
@@ -142,3 +136,27 @@ void CrackSBX_LogResult(struct XorData* result, uint8_t key) {
     }
 }
 
+struct PotentialKeys CrackSBX_Evaluate(int* scores) {
+    // Find the top 5 values
+    struct PotentialKeys results = {0};
+    // Find the top 12 characters
+    for (int i = 0; i < 256; i++) {
+        uint8_t byte = (uint8_t) i;
+        int count = scores[i];
+        for (int j = 0; j < 5; j++) {
+            bool is_larger = count > results.scores[j];
+            // index 0 has the biggest max, set it unconditionally
+            if (((j == 0) && is_larger) ||
+                (is_larger && (count <= results.scores[j-1]) && (byte != results.keys[j-1]))) {
+                    // Shift the array to make space for this new max value
+                    for(int k = 4; k > j; k--) {
+                        results.scores[k] = results.scores[k-1];
+                        results.keys[k] = results.keys[k-1];
+                    }
+                results.scores[j] = count;
+                results.keys[j] = byte;
+            }
+        }
+    }
+    return results;
+}

@@ -6,7 +6,6 @@
 #include "cli/argtype.h"
 #include "cli/subcommand.h"
 #include "operations/xor.h"
-#include "operations/sbxor.h"
 #include "parsers/hex.h"
 #include "types/buffer.h"
 #include "xor_cli.h"
@@ -72,7 +71,7 @@ int perform_sbx(char* a, char* b) {
         struct Arg* right = Argtype_New(b);
         if (right != NULL) {
             if (left->length == 1) {
-                struct XorData result = SBX_Perform(*left->data, right->data, right->length);
+                struct XorData result = sb_xor(*left->data, right->data, right->length);
                 if (result.data != NULL) {
                     char* encoded = Hex_Encode(result.data, result.length);
                     if (encoded != NULL) {

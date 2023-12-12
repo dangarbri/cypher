@@ -6,7 +6,7 @@
 #include "cli/argtype.h"
 #include "cli/subcommand.h"
 #include "crackers/cracksbx.h"
-#include "operations/sbxor.h"
+#include "operations/xor.h"
 #include "crack.h"
 
 int CrackCli_SingleByteXor(int argc, char* argv[]);
@@ -80,7 +80,7 @@ int CrackCli_SingleByteXor(int argc, char* argv[]) {
             struct PotentialKeys keys = CrackSBX(&buf, English_Analyzer, verbose);
             printf("Potential Keys:\n");
             for (int i = 0; i < 5; i++) {
-                struct XorData pt = SBX_Perform(keys.keys[i], buf.data, buf.length);
+                struct XorData pt = sb_xor(keys.keys[i], buf.data, buf.length);
                 if (pt.data != NULL) {
                     printf("  0x%02X | Score %.02f | Message: %s\n", keys.keys[i], keys.scores[i], pt.data);
                     free(pt.data);

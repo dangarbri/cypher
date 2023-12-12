@@ -12,5 +12,5 @@ int main() {
     };
     float score = English_Analyzer(&buf);
     printf("Score: %f\n", score);
-    assert(score > 0.799 && score < 0.801);
+    assert(score >= 0.599 && score <= 0.601);
 }

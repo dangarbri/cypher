@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../src/operations/sbxor.h"
+#include "../src/operations/xor.h"
 
 int main() {
     uint8_t* testbuf = malloc(20);
@@ -12,7 +12,7 @@ int main() {
 		exit(1);
 	}
     memset(testbuf, 0, 20);
-    struct XorData result = SBX_Perform(0x0a, testbuf, 20);
+    struct XorData result = sb_xor(0x0a, testbuf, 20);
     (void)result;
     assert(result.data != NULL);
     assert(result.length == 20);

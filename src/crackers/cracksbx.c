@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "operations/sbxor.h"
+#include "operations/xor.h"
 #include "cracksbx.h"
 
 /**
@@ -43,7 +43,7 @@ struct PotentialKeys CrackSBX(struct Buffer* buf, Analyzer analyzer, bool verbos
 
 float CrackSBX_TestKey(struct Buffer* buffer, uint8_t key, Analyzer analyzer, bool verbose) {
     float score = -1;
-    struct XorData result = SBX_Perform(key, buffer->data, buffer->length);
+    struct XorData result = sb_xor(key, buffer->data, buffer->length);
     if (result.data != NULL) {
         struct Buffer result_buffer = {
             .data = result.data,

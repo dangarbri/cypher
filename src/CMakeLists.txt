@@ -27,7 +27,6 @@ add_executable(cypher
   commands/base64_cli.c
   commands/crack.c
   commands/xor_cli.c
-  operations/sbxor.c
   operations/xor.c
   parsers/base64.c
   parsers/hex.c
@@ -77,7 +76,7 @@ add_executable(test_xor
 )
 add_executable(test_sbxor
   ../test/test_sbxor.c
-  operations/sbxor.c
+  operations/xor.c
 )
 add_executable(test_buffer
   ../test/test_buffer.c
@@ -93,7 +92,7 @@ add_executable(test_cracksbx
   parsers/hex.c
   crackers/cracksbx.c
   analyzers/english.c
-  operations/sbxor.c
+  operations/xor.c
   threading/pool.c
   types/buffer.c
 )

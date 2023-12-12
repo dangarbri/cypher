@@ -190,7 +190,7 @@ int sbx_cli_crack(int argc, char* argv[]) {
             for (int i = 0; i < 5; i++) {
                 struct XorData pt = SBX_Perform(keys.keys[i], buf.data, buf.length);
                 if (pt.data != NULL) {
-                    printf("  0x%02X | Score %f | Message: %s\n", keys.keys[i], keys.scores[i], pt.data);
+                    printf("  0x%02X | Score %.02f | Message: %s\n", keys.keys[i], keys.scores[i], pt.data);
                     free(pt.data);
                 } else {
                     fputs("Failed to allocate memory?", stderr);

@@ -25,14 +25,13 @@ void CrackSBX_LogResult(struct XorData* result, uint8_t key);
  * @param scores pointer to array of 256 scores, one for each key
  * @return top 5 keys
  */
-struct PotentialKeys CrackSBX_Evaluate(int* scores);
+struct PotentialKeys CrackSBX_Evaluate(float* scores);
 
 
 struct PotentialKeys CrackSBX_SingleThread(struct Buffer* buf, Analyzer analyzer, bool verbose) {
-    int scores[256] = {0};
+    float scores[256] = {0};
     for (int i = 0; i < 256; i++) {
-        float result = CrackSBX_TestKey(buf, (uint8_t) i, analyzer, verbose);
-        scores[i] = (int) (result * 1000);
+        scores[i] = CrackSBX_TestKey(buf, (uint8_t) i, analyzer, verbose);
     }
     return CrackSBX_Evaluate(&scores[0]);
 }
@@ -75,13 +74,13 @@ void CrackSBX_LogResult(struct XorData* result, uint8_t key) {
     }
 }
 
-struct PotentialKeys CrackSBX_Evaluate(int* scores) {
+struct PotentialKeys CrackSBX_Evaluate(float* scores) {
     // Find the top 5 values
     struct PotentialKeys results = {0};
     // Find the top 12 characters
     for (int i = 0; i < 256; i++) {
         uint8_t byte = (uint8_t) i;
-        int count = scores[i];
+        float count = scores[i];
         for (int j = 0; j < 5; j++) {
             bool is_larger = count > results.scores[j];
             // index 0 has the biggest max, set it unconditionally
@@ -92,7 +91,7 @@ struct PotentialKeys CrackSBX_Evaluate(int* scores) {
                         results.scores[k] = results.scores[k-1];
                         results.keys[k] = results.keys[k-1];
                     }
-                results.scores[j] = (float) count;
+                results.scores[j] = count;
                 results.keys[j] = byte;
             }
         }

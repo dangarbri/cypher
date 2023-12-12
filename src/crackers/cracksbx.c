@@ -1,13 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <threads.h>
-
 #include "operations/sbxor.h"
 #include "cracksbx.h"
-
-// Force using the single threaded implementation
-// It's faster for this attack...
-#define __STDC_NO_THREADS__
 
 /**
  * Tests the likelihood that key is the right one for this buffer.
@@ -34,8 +29,6 @@ void CrackSBX_LogResult(struct XorData* result, uint8_t key);
 struct PotentialKeys CrackSBX_Evaluate(int* scores);
 
 
-#ifdef __STDC_NO_THREADS__
-
 struct PotentialKeys CrackSBX_SingleThread(struct Buffer* buf, Analyzer analyzer, bool verbose) {
     int scores[256] = {0};
     for (int i = 0; i < 256; i++) {
@@ -45,62 +38,9 @@ struct PotentialKeys CrackSBX_SingleThread(struct Buffer* buf, Analyzer analyzer
     return CrackSBX_Evaluate(&scores[0]);
 }
 
-#else
-
-struct ThreadArgs {
-    struct Buffer* data;
-    uint8_t key_to_test;
-    Analyzer analyzer;
-    bool verbose;
-};
-
-int CrackSBX_Thread(void* data) {
-    struct ThreadArgs* args = (struct ThreadArgs*) data;
-    float result = CrackSBX_TestKey(args->data, args->key_to_test, args->analyzer, args->verbose);
-    return (int) (result * 1000);
-}
-
-struct PotentialKeys CrackSBX_Multithreaded(struct Buffer* buf, Analyzer analyzer, bool verbose) {
-    // Create threads to test keys from 0 to 255
-    thrd_t threads[256] = {0};
-    int scores[256] = {0};
-    struct ThreadArgs args[256];
-    // Spin up a thread for each possible byte to test
-    for (int i = 0; i < 256; i++) {
-        args[i].analyzer = analyzer;
-        args[i].data = buf;
-        args[i].key_to_test = (uint8_t) i;
-        args[i].verbose = verbose;
-        if (thrd_create(&threads[i], CrackSBX_Thread, &args[i]) != thrd_success) {
-            fputs("Failed to start thread for cracksbx", stderr);
-            break;
-        }
-    }
-    // Wait for all the threads to complete, and store their results in the scores array
-    for (int i = 0; i < 256; i++) {
-        // The thread may not be initialized if thrd_create failed.
-        if (threads[i] != 0) {
-            if (thrd_join(threads[i], &scores[i]) == thrd_error) {
-                fputs("Failed to join cracksbx thread, but going to keep running anyway", stderr);
-            }
-        }
-    }
-
-    return CrackSBX_Evaluate(&scores[0]);
-}
-#endif
-
 struct PotentialKeys CrackSBX(struct Buffer* buf, Analyzer analyzer, bool verbose) {
-    #ifdef __STDC_NO_THREADS__
     // Single threaded implementation
     return CrackSBX_SingleThread(buf, analyzer, verbose);
-    #else
-    // Multithreaded implementation
-    // I know there's only 255 possibilities so a single threaded solution be fast enough,
-    // but I'm interested in learning the C11 threading library, and this is an
-    // easy enough place to try it out.
-    return CrackSBX_Multithreaded(buf, analyzer, verbose);
-    #endif
 }
 
 float CrackSBX_TestKey(struct Buffer* buffer, uint8_t key, Analyzer analyzer, bool verbose) {

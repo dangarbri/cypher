@@ -26,6 +26,7 @@ add_executable(cypher
   operations/xor.c
   parsers/base64.c
   parsers/hex.c
+  threading/pool.c
 )
 include_directories(
   ../src
@@ -87,6 +88,7 @@ add_executable(test_cracksbx
   crackers/cracksbx.c
   analyzers/english.c
   operations/sbxor.c
+  threading/pool.c
   types/buffer.c
 )
 add_executable(test_threadpool

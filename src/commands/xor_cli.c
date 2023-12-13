@@ -11,10 +11,12 @@
 #include "xor_cli.h"
 
 int sbx_cli_cmd(int argc, char* argv[]);
+int repeating_xor_cmd(int argc, char* argv[]);
 int perform_xor(char* a, char* b);
 
 struct Subcommand xor_commands[] = {
     {"sbx", "single byte xor operation", sbx_cli_cmd},
+    {"rbx", "repeating byte xor operation", repeating_xor_cmd},
     {NULL}
 };
 
@@ -143,4 +145,40 @@ int XorCmd(int argc, char* argv[]) {
         xor_usage();
         return EXIT_FAILURE;
     }
+}
+
+int repeating_xor_cmd(int argc, char* argv[]) {
+    if (argc != 3) {
+        puts("Usage:\n"
+             "  rbx key message\n"
+             "\n"
+             "Repeating byte xor will sequentially xor each byte of key\n"
+             "with each byte of message. When the last byte of key is\n"
+             "reached, then the operation will continue from the first\n"
+             "byte of key. The result is that message is basically obfuscated\n"
+             "in chunks which are the size of the key length.");
+    }
+    int ret = EXIT_FAILURE;
+    struct Arg* key = Argtype_New(argv[1]);
+    if (key != NULL) {
+        struct Arg* message = Argtype_New(argv[2]);
+        if (message != NULL) {
+            struct Buffer* result = Buffer_New(message->buffer.length);
+            if (result != NULL) {
+                int status = rp_xor(result, &key->buffer, &message->buffer);
+                if (status == XOR_SUCCESS) {
+                    char* encoded = Hex_Encode(result->data, result->length);
+                    if (encoded != NULL) {
+                        printf("%s\n", encoded);
+                        ret = EXIT_SUCCESS;
+                        free(encoded);
+                    }
+                }
+                Buffer_Free(result);
+            }
+            Argtype_Free(message);
+        }
+        Argtype_Free(key);
+    }
+    return ret;
 }

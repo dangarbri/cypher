@@ -78,13 +78,16 @@ struct Base64Data Base64_Decode(char* data) {
         .length = 0,
         .valid = false
     };
+    bool no_newlines = strchr((char*) data, '\n') == NULL;
     size_t length = strlen(data);
     // Create a BIO around the base64 encoded data
     BIO* encoded = BIO_new_mem_buf(data, (int) length);
     if (encoded != NULL) {
         // Instantiate base64 decoder
         BIO* b64 = BIO_new(BIO_f_base64());
-        BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
+        if (no_newlines) {
+            BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
+        }
         if (b64 != NULL) {
             // Attach encoded buffer to b64 decoder
             BIO_push(b64, encoded);

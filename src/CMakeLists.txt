@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.27)
 project(cypher VERSION 0.0.1 LANGUAGES C)
 enable_testing()
 
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/../test/test_data
+     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
 # Enable warnings as errors, define Windows/Other variables
 if(MSVC)
   add_compile_options(/W4 /WX)
@@ -143,6 +146,9 @@ add_test(NAME sbxor COMMAND test_sbxor)
 add_test(NAME buffer COMMAND test_buffer)
 add_test(NAME EnglishAnalyzer COMMAND test_english)
 add_test(NAME CrackSBX COMMAND test_cracksbx)
+add_test(NAME CrackRBX COMMAND test_crackrbx)
+add_test(NAME Rank COMMAND test_rank)
+add_test(NAME Hamming COMMAND test_hamming)
 add_test(NAME ThreadPool COMMAND test_threadpool)
 
 # Eventually will need to add openssl to this.

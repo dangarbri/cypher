@@ -29,10 +29,13 @@ enum XorResult xor(struct Buffer* result, struct Buffer* a, struct Buffer* b);
  *
  * You must free the resultant buffer with Buffer_Free
  *
+ * @param result Output buffer where result is stored
  * @param byte XOR key
  * @param data Buffer to xor
- * @return New buffer, data may be NULL if memory allocation fails
+ * @return XOR_SUCCESS on success.
  */
-struct Buffer* sb_xor(uint8_t key, struct Buffer* data);
+enum XorResult sb_xor(struct Buffer* result, uint8_t key, struct Buffer* data);
+
+
 
 #endif

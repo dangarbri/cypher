@@ -14,14 +14,12 @@ enum XorResult xor(struct Buffer* result, struct Buffer* a, struct Buffer* b) {
 }
 
 
-struct Buffer* sb_xor(uint8_t key, struct Buffer* buffer) {
-    struct Buffer* result = Buffer_New(buffer->length);
-    if (result->data != NULL) {
-        for (size_t i = 0; i < buffer->length; i++) {
-            result->data[i] = buffer->data[i] ^ key;
-        }
-    } else {
-        fputs("sb_xor: Failed to allocate memory for buffer\n", stderr);
+enum XorResult sb_xor(struct Buffer* result, uint8_t key, struct Buffer* data) {
+    if (result->length != data->length) {
+        return XOR_INCORRECT_BUFFER_SIZE;
     }
-    return result;
+    for (size_t i = 0; i < data->length; i++) {
+        result->data[i] = data->data[i] ^ key;
+    }
+    return XOR_SUCCESS;
 }

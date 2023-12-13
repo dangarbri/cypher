@@ -73,13 +73,15 @@ int perform_sbx(char* a, char* b) {
         struct Arg* right = Argtype_New(b);
         if (right != NULL) {
             if (left->buffer.length == 1) {
-                struct Buffer* result = sb_xor(*left->buffer.data, &right->buffer);
+                struct Buffer* result = Buffer_New(right->buffer.length);
                 if (result != NULL) {
-                    char* encoded = Hex_Encode(result->data, result->length);
-                    if (encoded != NULL) {
-                        printf("%s\n", encoded);
-                        ret = EXIT_SUCCESS;
-                        free(encoded);
+                    if (sb_xor(result, *left->buffer.data, &right->buffer) == XOR_SUCCESS) {
+                        char* encoded = Hex_Encode(result->data, result->length);
+                        if (encoded != NULL) {
+                            printf("%s\n", encoded);
+                            ret = EXIT_SUCCESS;
+                            free(encoded);
+                        }
                     }
                     Buffer_Free(result);
                 }

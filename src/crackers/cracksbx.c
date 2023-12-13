@@ -43,11 +43,13 @@ struct PotentialKeys CrackSBX(struct Buffer* buf, Analyzer analyzer, bool verbos
 
 float CrackSBX_TestKey(struct Buffer* buffer, uint8_t key, Analyzer analyzer, bool verbose) {
     float score = -1;
-    struct Buffer* result = sb_xor(key, buffer);
+    struct Buffer* result = Buffer_New(buffer->length);
     if (result != NULL) {
-        score = analyzer(result);
-        if (verbose) {
-            CrackSBX_LogResult(result, key);
+        if (sb_xor(result, key, buffer) == XOR_SUCCESS) {
+            score = analyzer(result);
+            if (verbose) {
+                CrackSBX_LogResult(result, key);
+            }
         }
         Buffer_Free(result);
     }

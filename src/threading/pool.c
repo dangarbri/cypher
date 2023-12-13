@@ -150,3 +150,11 @@ int ThreadPool_Join(struct ThreadPool* pool) {
     }
     return thrd_success;
 }
+
+bool ThrdGood(thrd_t thread) {
+    thrd_t bad = {0};
+    // thrd_equal returns 0 if threads don't match.
+    // it will return non-zero if thread == 0
+    // This is here for cross platform support, thrd_t is unsigned long on linux and a struct on windows.
+    return thrd_equal(thread, bad) == 0;
+}

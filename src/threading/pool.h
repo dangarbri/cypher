@@ -1,8 +1,9 @@
 #ifndef _POOL_H_
 #define _POOL_H_
 
+#include <stdbool.h>
 #include <stddef.h>
-#include <threads.h>
+#include "threading/thread_compat.h"
 
 struct ThreadPool {
     /** Array of thread identifiers */
@@ -88,5 +89,10 @@ int ThreadPool_Join(struct ThreadPool* pool);
 void ThreadPool_Free(struct ThreadPool* pool);
 
 void ThreadQueue_Free(struct ThreadQueue* queue);
+
+/**
+ * Checks if thrd_t is valid
+ */
+bool ThrdGood(thrd_t thread);
 
 #endif

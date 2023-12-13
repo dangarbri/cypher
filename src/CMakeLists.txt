@@ -130,6 +130,7 @@ add_executable(test_crackrbx
   operations/rank.c
   operations/xor.c
   parsers/hex.c
+  threading/pool.c
   types/buffer.c
 )
 

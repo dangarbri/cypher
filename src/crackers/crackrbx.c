@@ -4,10 +4,25 @@
 #include "operations/hamming.h"
 #include "operations/rank.h"
 #include "parsers/hex.h"
+#include "threading/pool.h"
+
 #include "cracksbx.h"
 #include "crackrbx.h"
 
 #define NUM_KEYS_TO_TEST (CRACKRBX_MAX_KEYS)
+struct CrackRbxThreadArgs {
+    size_t keylength;
+    const struct Buffer* buf;
+    Analyzer analyzer;
+    bool verbose;
+    struct Buffer** out;
+};
+
+/**
+ * Executes CrackRepeatingXor_WithKeyLength within a thread and writes the result to arg
+ * (benchmarking shows the threaded version runs in ~40ms while the single threaded version runs in ~100ms)
+ */
+int CrackRepeatingXor_WithKeyLength_Thread(void* arg);
 
 struct RepeatingXorKeys* CrackRepeatingXor(size_t keymin, size_t keymax, struct Buffer* buf, Analyzer analyzer, bool verbose) {
     if (verbose) {
@@ -32,32 +47,54 @@ struct RepeatingXorKeys* CrackRepeatingXor(size_t keymin, size_t keymax, struct 
         puts("");
     }
 
-    struct RepeatingXorKeys* keylist = malloc(sizeof(struct RepeatingXorKeys));
-    if (keylist != NULL) {
-        keylist->keys = calloc(num_keys_to_test, sizeof(keylist->keys));
-        keylist->length = num_keys_to_test;
-        if (keylist->keys != NULL) {
-            for (size_t i = 0; i < num_keys_to_test; i++) {
-                keylist->keys[i] = CrackRepeatingXor_WithKeyLength(rank.keysize[i], buf, analyzer, verbose);
-                if (keylist->keys[i] == NULL) {
-                    fprintf(stderr, "Error occurred while cracking repeating xor with key length %zu\n", rank.keysize[i]);
-                    CrackRBX_FreeKeys(keylist);
-                    return NULL;
+    struct RepeatingXorKeys* keylist = NULL;
+    struct ThreadPool* pool = ThreadPool_New(5);
+    if (pool != NULL) {
+        struct ThreadQueue* queue = ThreadQueue_New(num_keys_to_test);
+        struct CrackRbxThreadArgs args[num_keys_to_test];
+        if (queue != NULL) {
+            keylist = malloc(sizeof(struct RepeatingXorKeys));
+            if (keylist != NULL) {
+                keylist->keys = calloc(num_keys_to_test, sizeof(keylist->keys));
+                bool failure = true;
+                if (keylist->keys != NULL) {
+                    keylist->length = num_keys_to_test;
+                    for (size_t i = 0; i < num_keys_to_test; i++) {
+                        args[i].analyzer = analyzer;
+                        args[i].buf = buf;
+                        args[i].keylength = rank.keysize[i];
+                        args[i].verbose = verbose;
+                        args[i].out = &keylist->keys[i];
+                        queue->info[i].Function = CrackRepeatingXor_WithKeyLength_Thread;
+                        queue->info[i].arg = &args[i];
+                    }
+                    thrd_t bg_thread = ThreadPool_SubmitQueue(pool, queue);
+                    if (ThrdGood(bg_thread)) {
+                        int result;
+                        if ((thrd_join(bg_thread, &result) == thrd_success) && result != -1) {
+                            // Success finally in the mess...
+                            failure = false;
+                            if (verbose) {
+                                CrackRBX_PrintSummary(keylist);
+                            }
+                        }
+                    } else {
+                        fputs("Failed to start crackrbx threads\n", stderr);
+                    }
                 }
+                if (failure) {
+                    CrackRBX_FreeKeys(keylist);
+                    keylist = NULL;
+                    fputs("CrackRBX failed\n", stderr);
+                }
+            } else {
+                perror("CrackSBX");
             }
-            // Success hidden in the mess...
-            if (verbose) {
-                CrackRBX_PrintSummary(keylist);
-            }
-            return keylist;
-        } else {
-            perror("CrackRBX");
+            ThreadQueue_Free(queue);
         }
-        CrackRBX_FreeKeys(keylist);
-    } else {
-        perror("CrackSBX");
+        ThreadPool_Free(pool);
     }
-    return NULL;
+    return keylist;
 }
 
 int CrackRBX_RankKeySizes(struct RankedKeySize* out, size_t keymin, size_t keymax, struct Buffer* buf) {
@@ -113,8 +150,6 @@ int CrackRBX_RankKeySizes(struct RankedKeySize* out, size_t keymin, size_t keyma
 }
 
 struct Buffer* CrackRepeatingXor_WithKeyLength(size_t keylength, const struct Buffer* buf, Analyzer analyzer, bool verbose) {
-    (void)analyzer;
-    (void)verbose;
     if ((keylength == 0) || (buf == NULL)) {
         return NULL;
     }
@@ -191,4 +226,10 @@ void CrackRBX_PrintSummary(struct RepeatingXorKeys* keylist) {
             }
         }
     }
+}
+
+int CrackRepeatingXor_WithKeyLength_Thread(void* arg) {
+    struct CrackRbxThreadArgs* args = (struct CrackRbxThreadArgs*) arg;
+    *args->out = CrackRepeatingXor_WithKeyLength(args->keylength, args->buf, args->analyzer, args->verbose);
+    return 0;
 }

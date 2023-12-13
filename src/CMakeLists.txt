@@ -118,6 +118,15 @@ add_executable(test_rank
   ../test/test_rank.c
   operations/rank.c
 )
+add_executable(test_crackrbx
+  ../test/test_crackrbx.c
+  analyzers/english.c
+  crackers/crackrbx.c
+  operations/hamming.c
+  operations/rank.c
+  parsers/hex.c
+  types/buffer.c
+)
 
 add_test(NAME Subcommands COMMAND test_subcommand)
 add_test(NAME Parsers COMMAND test_parsers)

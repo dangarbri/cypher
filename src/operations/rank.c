@@ -43,3 +43,7 @@ int RankInt(size_t* out, size_t n, const int* array, size_t length) {
 int RankFloat(size_t* out, size_t n, const float* array, size_t length) {
     _RankX(float, out, n, array, length);
 }
+
+int RankSize(size_t* out, size_t n, const size_t* array, size_t length) {
+    _RankX(size_t, out, n, array, length);
+}

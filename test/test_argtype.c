@@ -35,9 +35,19 @@ void test_Argtype_Parse_Base64() {
     Argtype_Free((struct Arg*) arg);
 }
 
+void test_Argtype_Parse_File() {
+    struct Arg* arg = Argtype_New("file:test_data/cypher");
+    assert(arg != NULL);
+    assert(arg->type == ARGTYPE_BINARY);
+    assert(arg->buffer.length == 14);
+    assert(strncmp("Hello, cypher\n", arg->buffer.data, 14) == 0);
+    Argtype_Free(arg);
+}
+
 int main() {
     test_Argtype_Parse();
     test_Argtype_Parse_Hex();
     test_Argtype_Parse_Base64();
+    test_Argtype_Parse_File();
     return 0;
 }

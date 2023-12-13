@@ -27,7 +27,19 @@ struct Buffer* Buffer_New(size_t size);
  * @param buf buffer to clone
  * @returns new buffer or NULL
  */
-struct Buffer* Buffer_Clone(struct Buffer* buf);
+struct Buffer* Buffer_Clone(const struct Buffer* buf);
+
+/**
+ * Returns a new buffer, which contains the contents of buf transposed
+ * Transposed means that each row of block_size becomes a column of block_size.
+ * For example, if buf has 123456789 and you give block_size 3, then the result is 147258369
+ * If the transposition can't be done perfectly, the final block is dropped
+ * For example if buf has 123456789 and block_size is 4, the result is 15263748 and 9 is dropped
+ * @param buf Buffer to transpose
+ * @param block_size Block size. Buffer length must be a multiple of block size
+ * @returns transposed buffer or NULL
+ */
+struct Buffer* Buffer_Transpose(const struct Buffer* buf, size_t block_size);
 
 /**
  * Frees a buffer allocated with Buffer_New
@@ -42,6 +54,6 @@ void Buffer_Free(struct Buffer* buffer);
 /**
  * Checks if a buffer is valid and safe to use
  */
-bool Buffer_IsValid(struct Buffer* buffer);
+bool Buffer_IsValid(const struct Buffer* buffer);
 
 #endif

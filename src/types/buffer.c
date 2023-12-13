@@ -33,11 +33,11 @@ void Buffer_Free(struct Buffer* buffer) {
     }
 }
 
-bool Buffer_IsValid(struct Buffer* buffer) {
+bool Buffer_IsValid(const struct Buffer* buffer) {
     return (buffer != NULL) && (buffer->data != NULL) && (buffer->length != 0);
 }
 
-struct Buffer* Buffer_Clone(struct Buffer* buf) {
+struct Buffer* Buffer_Clone(const struct Buffer* buf) {
     if (!Buffer_IsValid(buf)) { return NULL; }
 
     struct Buffer* newbuf = Buffer_New(buf->length);
@@ -48,4 +48,59 @@ struct Buffer* Buffer_Clone(struct Buffer* buf) {
 
     memcpy(newbuf->data, buf->data, buf->length);
     return newbuf;
+}
+
+struct Buffer* Buffer_Transpose(const struct Buffer* buf, size_t block_size) {
+    if (!Buffer_IsValid(buf)) { return NULL; }
+    if (buf->length < block_size) { return Buffer_Clone(buf); }
+
+    struct Buffer* transposed = NULL;
+    // Clone the input buffer, since we need to modify the data to transpose it
+    struct Buffer* clone = Buffer_Clone(buf);
+    if (clone != NULL) {
+        size_t num_blocks = buf->length / block_size;
+        // In the case that block size is 1, copy only one block to the output
+        if (num_blocks == 1) {
+            transposed = Buffer_New(block_size);
+            if (transposed != NULL) {
+                for (size_t i = 0; i < block_size; i++) {
+                    transposed->data[i] = clone->data[i];
+                }
+            }
+        } else {
+            // There are multiple blocks available so we can do transposition.
+            // Thanks to integer division, num_blocks represents whole blocks
+            // Allocate enough space for the blocks, and perform the transposition.
+            transposed = Buffer_New(num_blocks * block_size);
+            if (transposed != NULL) {
+                uint8_t* blocks[num_blocks];
+                // One column for each key byte
+                uint8_t* transposed_blocks[block_size];
+                // Get a pointer to each block
+                for (size_t i = 0; i < num_blocks; i++) {
+                    blocks[i] = &clone->data[i * block_size];
+                }
+                // Get a pointer to each transposed block
+                for (size_t i = 0; i < block_size; i++) {
+                    transposed_blocks[i] = &transposed->data[i * num_blocks];
+                }
+                // Transpose the blocks into transposed_blocks
+                // Move the 1st byte of each block into the first transposed block
+                // Move the 2nd byte of each block into the second transposed block
+                // etc
+                for (size_t i = 0; i < block_size; i++) {
+                    uint8_t* column = transposed_blocks[i];
+                    for (size_t j = 0; j < num_blocks; j++) {
+                        uint8_t* block = blocks[j];
+                        column[j] = block[i];
+                    }
+                }
+            }
+        }
+        Buffer_Free(clone);
+    } else {
+        Buffer_Free(transposed);
+        transposed = NULL;
+    }
+    return transposed;
 }

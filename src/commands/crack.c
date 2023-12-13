@@ -6,13 +6,16 @@
 #include "cli/argtype.h"
 #include "cli/subcommand.h"
 #include "crackers/cracksbx.h"
+#include "crackers/crackrbx.h"
 #include "operations/xor.h"
 #include "crack.h"
 
 int CrackCli_SingleByteXor(int argc, char* argv[]);
+int CrackCLI_RepeatingXor(int argc, char* argv[]);
 
 struct Subcommand CrackCommands[] = {
-    {"sbx", "Crack single byte xor", CrackCli_SingleByteXor},
+    {"sbx", "Crack single byte xor cipher", CrackCli_SingleByteXor},
+    {"rbx", "Crack repeating xor cipher", CrackCLI_RepeatingXor},
     {NULL}
 };
 
@@ -92,4 +95,44 @@ int CrackCli_SingleByteXor(int argc, char* argv[]) {
         }
     }
     return 0;
+}
+
+int CrackCLI_RepeatingXor(int argc, char* argv[]) {
+    if ((argc < 2) || (argc > 4)) {
+        puts("Usage:\n"
+             "  rbx <ciphertext> [min key length] [max key length]\n"
+             "\n"
+             "Attempts to crack a repeating xor cipher and returns key values.\n"
+             "You can specify the minimum and maximum key lengths to test.\n"
+             "By default, min key length is 2 and max is 40");
+        return EXIT_FAILURE;
+    }
+    size_t keymin = 2;
+    size_t keymax = 40;
+    if (argc > 2) {
+        long long user_keymin = atoll(argv[2]);
+        if (user_keymin <= 0) {
+            fputs("Invalid minimum key length", stderr);
+            return EXIT_FAILURE;
+        }
+        keymin = (size_t) user_keymin;
+    }
+    if (argc > 3) {
+        long long user_keymax = atoll(argv[3]);
+        if ((user_keymax <= 0) || (((size_t) user_keymax) < keymin)) {
+            fputs("Invalid maximum key length", stderr);
+            return EXIT_FAILURE;
+        }
+        keymax = (size_t) user_keymax;
+    }
+
+    struct Arg* arg = Argtype_New(argv[1]);
+    if (arg != NULL) {
+        struct RepeatingXorKeys* keys = CrackRepeatingXor(keymin, keymax, &arg->buffer, English_Analyzer, true);
+        CrackRBX_FreeKeys(keys);
+        Argtype_Free(arg);
+    } else {
+        return EXIT_FAILURE;
+    }
+    return EXIT_SUCCESS;
 }

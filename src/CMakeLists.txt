@@ -23,11 +23,13 @@ add_executable(cypher
   cli/argtype.c
   cli/subcommand.c
   crackers/cracksbx.c
+  crackers/crackrbx.c
   commands/analyze.c
   commands/base64_cli.c
   commands/crack.c
   commands/print.c
   commands/xor_cli.c
+  operations/hamming.c
   operations/rank.c
   operations/xor.c
   parsers/base64.c

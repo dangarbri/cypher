@@ -36,6 +36,17 @@ enum XorResult xor(struct Buffer* result, struct Buffer* a, struct Buffer* b);
  */
 enum XorResult sb_xor(struct Buffer* result, uint8_t key, struct Buffer* data);
 
-
+/**
+ * Performs a repeating xor operation.
+ * The key does not need to be the same length as data.
+ * Data will be xor'd in chunks of size key.
+ * Each byte of the key is used sequentially and when the key reaches its end,
+ * the xor operation goes back to the first byte of key.
+ * @param result Output buffer
+ * @param key Xor key
+ * @param data Data to obfuscate
+ * @return XOR_SUCCESS on success, else something else.
+ */
+enum XorResult rp_xor(struct Buffer* result, struct Buffer* key, struct Buffer* data);
 
 #endif

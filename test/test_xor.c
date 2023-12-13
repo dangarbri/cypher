@@ -1,8 +1,10 @@
 #include <assert.h>
+#include <stdio.h>
 #include <string.h>
+#include "../src/cli/argtype.h"
 #include "../src/operations/xor.h"
 
-int main() {
+void test_Xor() {
     char* a = "Hello";
     char result[5];
     struct Buffer result_buf = {
@@ -21,4 +23,31 @@ int main() {
     xor_result = xor(&result_buf, &result_buf, &left_buf);
     assert(xor_result == XOR_SUCCESS);
     assert(strncmp(result, a, 5) == 0);
+}
+
+void test_RepeatingXor() {
+    char* message = "Burning 'em, if you ain't quick and nimble";
+    char expected[] = "hex:0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272a282b2f20";
+    struct Arg* message_data = Argtype_New(message);
+    assert(message_data != NULL);
+    struct Arg* expected_data = Argtype_New(expected);
+    assert(expected_data != NULL);
+    assert(message_data->buffer.length == expected_data->buffer.length);
+    struct Buffer* result = Buffer_New(message_data->buffer.length);
+    assert(result != NULL);
+    struct Buffer key = {
+        .data = (uint8_t*) "ICE",
+        .length = 3
+    };
+    assert(message_data != NULL);
+    assert(rp_xor(result, &key, &message_data->buffer) == XOR_SUCCESS);
+    assert(memcmp(expected_data->buffer.data, result->data, result->length) == 0);
+    Buffer_Free(result);
+    Argtype_Free(expected_data);
+    Argtype_Free(message_data);
+}
+
+int main() {
+    test_Xor();
+    test_RepeatingXor();
 }

@@ -72,8 +72,14 @@ add_executable(test_parsers
 )
 add_executable(test_xor
   ../test/test_xor.c
+  cli/argtype.c
+  parsers/base64.c
+  parsers/hex.c
   operations/xor.c
   types/buffer.c
+)
+target_link_libraries(test_xor
+  LINK_PRIVATE ${Openssl_LIBRARIES}
 )
 add_executable(test_sbxor
   ../test/test_sbxor.c

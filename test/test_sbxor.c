@@ -19,4 +19,6 @@ int main() {
     for (int i = 0; i < 20; i++) {
         assert(result.data[i] == 0x0a);
     }
+    free(testbuf);
+    free(result.data);
 }

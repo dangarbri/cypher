@@ -73,10 +73,12 @@ add_executable(test_parsers
 add_executable(test_xor
   ../test/test_xor.c
   operations/xor.c
+  types/buffer.c
 )
 add_executable(test_sbxor
   ../test/test_sbxor.c
   operations/xor.c
+  types/buffer.c
 )
 add_executable(test_buffer
   ../test/test_buffer.c

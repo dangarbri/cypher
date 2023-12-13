@@ -6,19 +6,16 @@
 #include "../src/operations/xor.h"
 
 int main() {
-    uint8_t* testbuf = malloc(20);
-    if (testbuf == NULL) {
-		perror("malloc");
-		exit(1);
-	}
-    memset(testbuf, 0, 20);
-    struct XorData result = sb_xor(0x0a, testbuf, 20);
+    struct Buffer* testbuf = Buffer_New(20);
+    assert(testbuf != NULL);
+    memset(testbuf->data, 0, 20);
+    struct Buffer* result = sb_xor(0x0a, testbuf);
     (void)result;
-    assert(result.data != NULL);
-    assert(result.length == 20);
+    assert(result != NULL);
+    assert(result->length == 20);
     for (int i = 0; i < 20; i++) {
-        assert(result.data[i] == 0x0a);
+        assert(result->data[i] == 0x0a);
     }
-    free(testbuf);
-    free(result.data);
+    Buffer_Free(testbuf);
+    Buffer_Free(result);
 }

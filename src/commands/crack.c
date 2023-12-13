@@ -76,10 +76,10 @@ int CrackCli_SingleByteXor(int argc, char* argv[]) {
             struct PotentialKeys keys = CrackSBX(&arg->buffer, English_Analyzer, verbose);
             printf("Potential Keys:\n");
             for (int i = 0; i < 5; i++) {
-                struct XorData pt = sb_xor(keys.keys[i], arg->buffer.data, arg->buffer.length);
-                if (pt.data != NULL) {
-                    printf("  0x%02X | Score %.02f | Message: %s\n", keys.keys[i], keys.scores[i], pt.data);
-                    free(pt.data);
+                struct Buffer* pt = sb_xor(keys.keys[i], &arg->buffer);
+                if (pt != NULL) {
+                    printf("  0x%02X | Score %.02f | Message: %s\n", keys.keys[i], keys.scores[i], pt->data);
+                    Buffer_Free(pt);
                 } else {
                     fputs("Failed to allocate memory?", stderr);
                 }

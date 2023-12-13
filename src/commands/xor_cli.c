@@ -39,18 +39,20 @@ int perform_xor(char* a, char* b) {
         struct Arg* right = Argtype_New(b);
         if (right != NULL) {
             if (left->buffer.length == right->buffer.length) {
-                uint8_t* result = malloc(left->buffer.length);
+                struct Buffer* result = Buffer_New(right->buffer.length);
                 if (result != NULL) {
-                    xor(result, left->buffer.data, right->buffer.data, left->buffer.length);
-                    char* encoded = Hex_Encode(result, left->buffer.length);
-                    if (encoded != NULL) {
-                        printf("%s\n", encoded);
-                        ret = EXIT_SUCCESS;
-                        free(encoded);
-                    } else {
-                        fputs("Failed to hex encode xor result", stderr);
+                    enum XorResult xor_result = xor(result, &left->buffer, &right->buffer);
+                    if (xor_result == XOR_SUCCESS) {
+                        char* encoded = Hex_Encode(result->data, result->length);
+                        if (encoded != NULL) {
+                            printf("%s\n", encoded);
+                            ret = EXIT_SUCCESS;
+                            free(encoded);
+                        } else {
+                            fputs("Failed to hex encode xor result", stderr);
+                        }
                     }
-                    free(result);
+                    Buffer_Free(result);
                 } else {
                     perror("xor_cli: ");
                 }
@@ -71,15 +73,15 @@ int perform_sbx(char* a, char* b) {
         struct Arg* right = Argtype_New(b);
         if (right != NULL) {
             if (left->buffer.length == 1) {
-                struct XorData result = sb_xor(*left->buffer.data, right->buffer.data, right->buffer.length);
-                if (result.data != NULL) {
-                    char* encoded = Hex_Encode(result.data, result.length);
+                struct Buffer* result = sb_xor(*left->buffer.data, &right->buffer);
+                if (result != NULL) {
+                    char* encoded = Hex_Encode(result->data, result->length);
                     if (encoded != NULL) {
                         printf("%s\n", encoded);
                         ret = EXIT_SUCCESS;
                         free(encoded);
                     }
-                    free(result.data);
+                    Buffer_Free(result);
                 }
             } else {
                 fprintf(stderr, "Left argument must be 1 byte long. Got %zu bytes\n", left->buffer.length);

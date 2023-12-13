@@ -18,7 +18,7 @@ float CrackSBX_TestKey(struct Buffer* buffer, uint8_t key, Analyzer analyzer, bo
  * @param result Xor data to write to the file
  * @param key Key that produced this result
  */
-void CrackSBX_LogResult(struct XorData* result, uint8_t key);
+void CrackSBX_LogResult(struct Buffer* result, uint8_t key);
 
 /**
  * Evaluates the given scores and returns the top 5 as potential keys
@@ -43,22 +43,18 @@ struct PotentialKeys CrackSBX(struct Buffer* buf, Analyzer analyzer, bool verbos
 
 float CrackSBX_TestKey(struct Buffer* buffer, uint8_t key, Analyzer analyzer, bool verbose) {
     float score = -1;
-    struct XorData result = sb_xor(key, buffer->data, buffer->length);
-    if (result.data != NULL) {
-        struct Buffer result_buffer = {
-            .data = result.data,
-            .length = result.length
-        };
-        score = analyzer(&result_buffer);
+    struct Buffer* result = sb_xor(key, buffer);
+    if (result != NULL) {
+        score = analyzer(result);
         if (verbose) {
-            CrackSBX_LogResult(&result, key);
+            CrackSBX_LogResult(result, key);
         }
-        free(result.data);
+        Buffer_Free(result);
     }
     return score;
 }
 
-void CrackSBX_LogResult(struct XorData* result, uint8_t key) {
+void CrackSBX_LogResult(struct Buffer* result, uint8_t key) {
     // Create the file to write to
     char* format = "cracksbx_%02X.txt";
     char fname[16];

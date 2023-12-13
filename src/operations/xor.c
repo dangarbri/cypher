@@ -3,26 +3,25 @@
 
 #include "xor.h"
 
-void xor(uint8_t* result, const uint8_t* a, const uint8_t* b, size_t length) {
-    for (size_t i = 0; i < length; i++) {
-        result[i] = a[i] ^ b[i];
+enum XorResult xor(struct Buffer* result, struct Buffer* a, struct Buffer* b) {
+    if ((a->length != b->length) || (result->length != a->length)) {
+        return XOR_INCORRECT_BUFFER_SIZE;
     }
+    for (size_t i = 0; i < a->length; i++) {
+        result->data[i] = a->data[i] ^ b->data[i];
+    }
+    return XOR_SUCCESS;
 }
 
 
-struct XorData sb_xor(uint8_t key, uint8_t* data, size_t length) {
-    struct XorData result = {
-        .data = NULL,
-        .length = 0
-    };
-    result.data = malloc(length);
-    if (result.data != NULL) {
-        result.length = length;
-        for (size_t i = 0; i < length; i++) {
-            result.data[i] = data[i] ^ key;
+struct Buffer* sb_xor(uint8_t key, struct Buffer* buffer) {
+    struct Buffer* result = Buffer_New(buffer->length);
+    if (result->data != NULL) {
+        for (size_t i = 0; i < buffer->length; i++) {
+            result->data[i] = buffer->data[i] ^ key;
         }
     } else {
-        perror("sb_xor: ");
+        fputs("sb_xor: Failed to allocate memory for buffer\n", stderr);
     }
     return result;
 }

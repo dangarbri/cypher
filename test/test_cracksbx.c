@@ -19,10 +19,10 @@ int main() {
     struct PotentialKeys keys = CrackSBX(&buf, English_Analyzer, false);
     printf("Potential Keys:\n");
     for (int i = 0; i < 5; i++) {
-        struct XorData pt = sb_xor(keys.keys[i], buf.data, buf.length);
-        assert(pt.data != NULL);
-        printf("  0x%02X | Score %f | Message: %s\n", keys.keys[i], keys.scores[i], pt.data);
-        free(pt.data);
+        struct Buffer* pt = sb_xor(keys.keys[i], &buf);
+        assert(pt != NULL);
+        printf("  0x%02X | Score %f | Message: %s\n", keys.keys[i], keys.scores[i], pt->data);
+        Buffer_Free(pt);
     }
     free(blob.data);
 }

@@ -157,6 +157,7 @@ int repeating_xor_cmd(int argc, char* argv[]) {
              "reached, then the operation will continue from the first\n"
              "byte of key. The result is that message is basically obfuscated\n"
              "in chunks which are the size of the key length.");
+        return EXIT_FAILURE;
     }
     int ret = EXIT_FAILURE;
     struct Arg* key = Argtype_New(argv[1]);

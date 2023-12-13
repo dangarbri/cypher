@@ -27,6 +27,7 @@ add_executable(cypher
   commands/base64_cli.c
   commands/crack.c
   commands/xor_cli.c
+  operations/rank.c
   operations/xor.c
   parsers/base64.c
   parsers/hex.c
@@ -100,6 +101,7 @@ add_executable(test_cracksbx
   parsers/hex.c
   crackers/cracksbx.c
   analyzers/english.c
+  operations/rank.c
   operations/xor.c
   threading/pool.c
   types/buffer.c

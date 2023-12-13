@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "operations/xor.h"
+#include "operations/rank.h"
 #include "cracksbx.h"
 
 /**
@@ -75,23 +76,13 @@ void CrackSBX_LogResult(struct Buffer* result, uint8_t key) {
 struct PotentialKeys CrackSBX_Evaluate(float* scores) {
     // Find the top 5 values
     struct PotentialKeys results = {0};
-    // Find the top 12 characters
-    for (int i = 0; i < 256; i++) {
-        uint8_t byte = (uint8_t) i;
-        float count = scores[i];
-        for (int j = 0; j < 5; j++) {
-            bool is_larger = count > results.scores[j];
-            // index 0 has the biggest max, set it unconditionally
-            if (((j == 0) && is_larger) ||
-                (is_larger && (count <= results.scores[j-1]) && (byte != results.keys[j-1]))) {
-                    // Shift the array to make space for this new max value
-                    for(int k = 4; k > j; k--) {
-                        results.scores[k] = results.scores[k-1];
-                        results.keys[k] = results.keys[k-1];
-                    }
-                results.scores[j] = count;
-                results.keys[j] = byte;
-            }
+    size_t top5_keys[5];
+    if (RankFloat(top5_keys, 5, scores, 256) == EXIT_SUCCESS) {
+        for (int i = 0; i < 5; i++) {
+            uint8_t key = (uint8_t)top5_keys[i];
+            float score = scores[key];
+            results.keys[i] = key;
+            results.scores[i] = score;
         }
     }
     return results;

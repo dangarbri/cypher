@@ -108,6 +108,14 @@ add_executable(test_threadpool
   ../test/test_threadpool.c
   threading/pool.c
 )
+add_executable(test_hamming
+  ../test/test_hamming.c
+  operations/hamming.c
+)
+add_executable(test_rank
+  ../test/test_rank.c
+  operations/rank.c
+)
 
 add_test(NAME Subcommands COMMAND test_subcommand)
 add_test(NAME Parsers COMMAND test_parsers)

@@ -21,6 +21,22 @@ void test_Transpose() {
     assert(memcmp((char*) transposed->data, "15263748", 8) == 0);
     Buffer_Free(transposed);
 
+    transposed = Buffer_Transpose(&i, 20);
+    assert(transposed != NULL);
+    assert(transposed->length == 9);
+    assert(memcmp((char*) transposed->data, "123456789", 9) == 0);
+    Buffer_Free(transposed);
+
+    struct Buffer j = {
+        .data = (uint8_t*) "123456789abcdefghi",
+        .length = 18
+    };
+    transposed = Buffer_Transpose(&j, 3);
+    assert(transposed != NULL);
+    assert(transposed->length == 18);
+    assert(memcmp((char*) transposed->data, "147adg258beh369cfi", 18) == 0);
+    Buffer_Free(transposed);
+
     assert(Buffer_Transpose(NULL, 4) == NULL);
 }
 

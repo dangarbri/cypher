@@ -87,3 +87,14 @@ struct PotentialKeys CrackSBX_Evaluate(float* scores) {
     }
     return results;
 }
+
+void CrackSBX_PrintKeys(struct PotentialKeys* keys) {
+    if (keys != NULL) {
+        for (int i = 0; i < 5; i++) {
+            printf("0x%X", keys->keys[i]);
+            if (i != 4) {
+                printf(", ");
+            }
+        }
+    }
+}

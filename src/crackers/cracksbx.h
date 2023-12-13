@@ -18,4 +18,9 @@ struct PotentialKeys {
  */
 struct PotentialKeys CrackSBX(struct Buffer* buf, Analyzer analyzer, bool verbose);
 
+/**
+ * Prints the given keys to stdout
+ */
+void CrackSBX_PrintKeys(struct PotentialKeys* keys);
+
 #endif

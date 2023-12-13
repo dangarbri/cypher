@@ -9,6 +9,9 @@ struct RankedKeySize {
     size_t keysize[CRACKRBX_MAX_KEYS];
 };
 
+/**
+ * List of keys
+ */
 struct RepeatingXorKeys {
     /** Array of pointers to buffers containing keys */
     struct Buffer** keys;
@@ -34,7 +37,7 @@ struct RepeatingXorKeys* CrackRepeatingXor(size_t keymin, size_t keymax, struct 
  * @note This function allocates memory, free the result with Buffer_Free
  * @return key buffer or NULL
  */
-struct Buffer* CrackRepeatingXor_WithKeyLength(size_t keylength, struct Buffer* buf, Analyzer analyzer, bool verbose);
+struct Buffer* CrackRepeatingXor_WithKeyLength(size_t keylength, const struct Buffer* buf, Analyzer analyzer, bool verbose);
 
 /**
  * Ranks all key lengths between keymin and keymax (inclusive) on buffer buf
@@ -51,5 +54,10 @@ int CrackRBX_RankKeySizes(struct RankedKeySize* out, size_t keymin, size_t keyma
  * Frees memory allocated by the cracking process
  */
 void CrackRBX_FreeKeys(struct RepeatingXorKeys* keys);
+
+/**
+ * Prints a summary of the given keys to stdout
+ */
+void CrackRBX_PrintSummary(struct RepeatingXorKeys* keylist);
 
 #endif

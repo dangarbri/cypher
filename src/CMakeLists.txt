@@ -122,8 +122,10 @@ add_executable(test_crackrbx
   ../test/test_crackrbx.c
   analyzers/english.c
   crackers/crackrbx.c
+  crackers/cracksbx.c
   operations/hamming.c
   operations/rank.c
+  operations/xor.c
   parsers/hex.c
   types/buffer.c
 )

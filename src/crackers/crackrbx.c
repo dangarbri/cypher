@@ -3,6 +3,7 @@
 
 #include "operations/hamming.h"
 #include "operations/rank.h"
+#include "parsers/hex.h"
 #include "cracksbx.h"
 #include "crackrbx.h"
 
@@ -22,6 +23,14 @@ struct RepeatingXorKeys* CrackRepeatingXor(size_t keymin, size_t keymax, struct 
     // Count the number
     size_t num_keys = (keymax - keymin) + 1;
     size_t num_keys_to_test = num_keys < NUM_KEYS_TO_TEST ? num_keys : NUM_KEYS_TO_TEST;
+    if (verbose) {
+        printf("Choosing to test key lengths: ");
+        for (size_t i = 0; i < num_keys_to_test; i++) {
+            printf("%zu ", rank.keysize[i]);
+        }
+        puts("");
+        puts("");
+    }
 
     struct RepeatingXorKeys* keylist = malloc(sizeof(struct RepeatingXorKeys));
     if (keylist != NULL) {
@@ -38,7 +47,7 @@ struct RepeatingXorKeys* CrackRepeatingXor(size_t keymin, size_t keymax, struct 
             }
             // Success hidden in the mess...
             if (verbose) {
-                puts("We may have cracked it!");
+                CrackRBX_PrintSummary(keylist);
             }
             return keylist;
         } else {
@@ -103,16 +112,55 @@ int CrackRBX_RankKeySizes(struct RankedKeySize* out, size_t keymin, size_t keyma
     return EXIT_SUCCESS;
 }
 
-struct Buffer* CrackRepeatingXor_WithKeyLength(size_t keylength, struct Buffer* buf, Analyzer analyzer, bool verbose) {
+struct Buffer* CrackRepeatingXor_WithKeyLength(size_t keylength, const struct Buffer* buf, Analyzer analyzer, bool verbose) {
     (void)analyzer;
     (void)verbose;
     if ((keylength == 0) || (buf == NULL)) {
         return NULL;
     }
 
+    if (verbose) {
+        printf("Testing key length %zu\n", keylength);
+        puts("");
+    }
+
+    /**
+     * Now that you probably know the KEYSIZE: break the ciphertext into blocks of KEYSIZE length.
+     * Now transpose the blocks: make a block that is the first byte of every block, and a block that is the second byte of every block, and so on.
+     */
     struct Buffer* key = Buffer_New(keylength);
-    if (key == NULL) {
-        return NULL;
+    if (key != NULL) {
+        struct Buffer* transposed = Buffer_Transpose(buf, keylength);
+        if (transposed != NULL) {
+            size_t num_blocks = buf->length / keylength;
+            // After transposing, we have strings of letters that were xor'd with the same byte
+            // that we can attempt to crack with the single byte xor method
+            for (size_t i = 0; i < keylength; i++) {
+                struct Buffer cipher = {
+                    .data = &transposed->data[i * num_blocks],
+                    .length = num_blocks
+                };
+                struct PotentialKeys cracked_keys = CrackSBX(&cipher, analyzer, false);
+                if (verbose) {
+                    printf("Byte %zu: ", i);
+                    CrackSBX_PrintKeys(&cracked_keys);
+                    puts("");
+                }
+                key->data[i] = cracked_keys.keys[0];
+            }
+            if (verbose) {
+                char* keystr = Hex_Encode(key->data, key->length);
+                if (keystr != NULL) {
+                    printf("Possible key -> hex:%s\n", keystr);
+                    free(keystr);
+                }
+            }
+            puts("---------------------------------------------");
+            Buffer_Free(transposed);
+        } else {
+            Buffer_Free(key);
+            key = NULL;
+        }
     }
 
     return key;
@@ -129,5 +177,18 @@ void CrackRBX_FreeKeys(struct RepeatingXorKeys* keys) {
             free(keys->keys);
         }
         free(keys);
+    }
+}
+
+void CrackRBX_PrintSummary(struct RepeatingXorKeys* keylist) {
+    if (keylist != NULL) {
+        printf("Found %zu potential keys\n", keylist->length);
+        for (size_t i = 0; i < keylist->length; i++) {
+            char* keystr = Hex_Encode(keylist->keys[i]->data, keylist->keys[i]->length);
+            if (keystr != NULL) {
+                printf("%zu: %4zu Bytes -> hex:%s\n", i, keylist->keys[i]->length, keystr);
+                free(keystr);
+            }
+        }
     }
 }

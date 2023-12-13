@@ -3,6 +3,7 @@
 #include "commands/analyze.h"
 #include "commands/base64_cli.h"
 #include "commands/crack.h"
+#include "commands/print.h"
 #include "commands/xor_cli.h"
 
 int print_help(int argc, char* argv[]);
@@ -10,8 +11,9 @@ int print_help(int argc, char* argv[]);
 struct Subcommand commands[] = {
     {"help", "prints this help message", print_help},
     {"analyze", "analyze ciphertext", AnalyzeCmd},
-    {"crack", "encryption cracking utilities", CrackCli},
     {"base64", "base64 encoding utilities", Base64},
+    {"crack", "encryption cracking utilities", CrackCli},
+    {"print", "Print the input to stdout", PrintInput},
     {"xor", "xor on cli arguments", XorCmd},
     {NULL}
 };

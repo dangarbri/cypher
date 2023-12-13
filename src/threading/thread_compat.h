@@ -1,3 +1,4 @@
+#ifndef __STDC_NO_THREADS__
 #ifdef _MSC_VER
 // Visual Studio 2022 Version 17.8 claims to support the C11 threads standard
 // but they did not ship a header file with it.
@@ -16,7 +17,7 @@ struct thrd_t { // thread identifier for Win32
 };
 typedef struct thrd_t thrd_t;
 
-enum thrd_result { 
+enum thrd_result {
   thrd_success = 0,
   thrd_nomem = 1,
   thrd_timedout = 2,
@@ -34,3 +35,4 @@ extern int __cdecl thrd_join(thrd_t, int*);
 #else // _MSC_VER
 #include <threads.h>
 #endif // _MSC_VER
+#endif // __STDC_NO_THREADS__

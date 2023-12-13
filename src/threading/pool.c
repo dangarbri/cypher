@@ -3,6 +3,8 @@
 
 #include "pool.h"
 
+#ifndef __STDC_NO_THREADS__
+
 struct ThreadPool* ThreadPool_New(size_t count) {
     struct ThreadPool* pool = malloc(sizeof(struct ThreadPool));
     if (pool != NULL) {
@@ -158,3 +160,6 @@ bool ThrdGood(thrd_t thread) {
     // This is here for cross platform support, thrd_t is unsigned long on linux and a struct on windows.
     return thrd_equal(thread, bad) == 0;
 }
+#else
+// TODO: Implement single threaded "thread pool"
+#endif

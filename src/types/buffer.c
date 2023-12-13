@@ -1,6 +1,8 @@
-#include "buffer.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+#include "buffer.h"
 
 struct Buffer* Buffer_New(size_t size) {
     // Allocate 2 separate buffers.
@@ -33,4 +35,17 @@ void Buffer_Free(struct Buffer* buffer) {
 
 bool Buffer_IsValid(struct Buffer* buffer) {
     return (buffer != NULL) && (buffer->data != NULL) && (buffer->length != 0);
+}
+
+struct Buffer* Buffer_Clone(struct Buffer* buf) {
+    if (!Buffer_IsValid(buf)) { return NULL; }
+
+    struct Buffer* newbuf = Buffer_New(buf->length);
+    if (newbuf == NULL) {
+        perror("Buffer_Clone");
+        return NULL;
+    }
+
+    memcpy(newbuf->data, buf->data, buf->length);
+    return newbuf;
 }

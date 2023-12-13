@@ -23,6 +23,13 @@ struct Buffer {
 struct Buffer* Buffer_New(size_t size);
 
 /**
+ * Allocates a new buffer and copies the contents of buf into it.
+ * @param buf buffer to clone
+ * @returns new buffer or NULL
+ */
+struct Buffer* Buffer_Clone(struct Buffer* buf);
+
+/**
  * Frees a buffer allocated with Buffer_New
  * If you wish to claim the underlying buffer, you may set
  * buffer->data to NULL, then call Buffer_Free and it will

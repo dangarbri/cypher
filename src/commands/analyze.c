@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "analyze.h"
+#include "analyzers/ecb.h"
 #include "analyzers/english.h"
 #include "analyzers/sbx.h"
 #include "cli/argtype.h"
@@ -15,6 +16,7 @@ struct RegisteredAnalyzer {
 struct RegisteredAnalyzer RegisteredAnalyzers[] = {
     {"English", English_Analyzer},
     {"Single Byte Xor", SBX_EnglishAnalyzer},
+    {"ECB128", ECB128_Analyzer},
     {NULL}
 };
 

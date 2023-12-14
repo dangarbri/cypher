@@ -21,6 +21,7 @@ endif()
 
 add_executable(cypher
   main.c
+  analyzers/ecb.c
   analyzers/english.c
   analyzers/sbx.c
   cli/argtype.c

@@ -2,9 +2,8 @@
 
 #include "ecb.h"
 
-float ECB128_Analyzer(struct Buffer* buffer) {
+float ECB_Analyzer(struct Buffer* buffer, size_t blocksize) {
     if (!Buffer_IsValid(buffer)) { return 0.0f; }
-    const size_t blocksize = 16;
     size_t n_blocks = buffer->length / blocksize;
     size_t dupe_count = 0;
     for (size_t i = 0; i < (n_blocks - 1); i++) {
@@ -21,4 +20,12 @@ float ECB128_Analyzer(struct Buffer* buffer) {
     float dupe_score = (dupe_count > 20 ? 20.0f : (float) dupe_count) * 0.05f;
 
     return dupe_score;
+}
+
+float ECB128_Analyzer(struct Buffer* buffer) {
+    return ECB_Analyzer(buffer, 16);
+}
+
+float ECB256_Analyzer(struct Buffer* buffer) {
+    return ECB_Analyzer(buffer, 32);
 }

@@ -16,4 +16,10 @@
  */
 float ECB128_Analyzer(struct Buffer* buffer);
 
+/**
+ * Analyzes the given buffer to see if it may be encrypted
+ * via ECB block mode.
+ */
+float ECB256_Analyzer(struct Buffer* buffer);
+
 #endif

@@ -17,6 +17,7 @@ struct RegisteredAnalyzer RegisteredAnalyzers[] = {
     {"English", English_Analyzer},
     {"Single Byte Xor", SBX_EnglishAnalyzer},
     {"ECB128", ECB128_Analyzer},
+    {"ECB256", ECB256_Analyzer},
     {NULL}
 };
 

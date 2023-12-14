@@ -104,3 +104,14 @@ struct Buffer* Buffer_Transpose(const struct Buffer* buf, size_t block_size) {
     }
     return transposed;
 }
+
+bool Buffer_Resize(struct Buffer* buffer, size_t new_size) {
+    void* resized_buffer = realloc((void*) buffer->data, new_size);
+    if (resized_buffer == NULL) {
+        perror("Buffer_Resize");
+        return false;
+    }
+    buffer->data = resized_buffer;
+    buffer->length = new_size;
+    return true;
+}

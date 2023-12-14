@@ -56,4 +56,13 @@ void Buffer_Free(struct Buffer* buffer);
  */
 bool Buffer_IsValid(const struct Buffer* buffer);
 
+/**
+ * Resizes a given buffer and updates its length.
+ * @note If this returns false, the buffer remains untouched.
+ * @param buffer Buffer to resize
+ * @param new_size Desired byte size
+ * @returns true on success, false on failure
+ */
+bool Buffer_Resize(struct Buffer* buffer, size_t new_size);
+
 #endif

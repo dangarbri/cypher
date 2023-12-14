@@ -60,6 +60,7 @@ add_executable(test_argtype
   parsers/hex.c
   parsers/base64.c
   cli/argtype.c
+  types/buffer.c
 )
 target_include_directories(test_argtype PUBLIC
   ../src
@@ -78,6 +79,7 @@ target_link_libraries(test_base64
 add_executable(test_parsers
   ../test/test_parsers.c
   parsers/hex.c
+  types/buffer.c
 )
 add_executable(test_xor
   ../test/test_xor.c

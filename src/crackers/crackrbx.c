@@ -190,7 +190,7 @@ struct Buffer* CrackRepeatingXor_WithKeyLength(size_t keylength, const struct Bu
                 key->data[i] = cracked_keys.keys[0];
             }
             if (verbose) {
-                char* keystr = Hex_Encode(key->data, key->length);
+                char* keystr = Hex_Encode(key);
                 if (keystr != NULL) {
                     fprintf(verbose_fp, "Possible key -> hex:%s\n", keystr);
                     free(keystr);
@@ -243,7 +243,7 @@ void CrackRBX_PrintSummary(struct RepeatingXorKeys* keylist) {
     if (keylist != NULL) {
         printf("Found %zu potential keys\n", keylist->length);
         for (size_t i = 0; i < keylist->length; i++) {
-            char* keystr = Hex_Encode(keylist->keys[i]->data, keylist->keys[i]->length);
+            char* keystr = Hex_Encode(keylist->keys[i]);
             if (keystr != NULL) {
                 printf("%zu: %4zu Bytes -> hex:%s\n", i, keylist->keys[i]->length, keystr);
                 free(keystr);

@@ -45,7 +45,7 @@ int perform_xor(char* a, char* b) {
                 if (result != NULL) {
                     enum XorResult xor_result = xor(result, &left->buffer, &right->buffer);
                     if (xor_result == XOR_SUCCESS) {
-                        char* encoded = Hex_Encode(result->data, result->length);
+                        char* encoded = Hex_Encode(result);
                         if (encoded != NULL) {
                             printf("%s\n", encoded);
                             ret = EXIT_SUCCESS;
@@ -78,7 +78,7 @@ int perform_sbx(char* a, char* b) {
                 struct Buffer* result = Buffer_New(right->buffer.length);
                 if (result != NULL) {
                     if (sb_xor(result, *left->buffer.data, &right->buffer) == XOR_SUCCESS) {
-                        char* encoded = Hex_Encode(result->data, result->length);
+                        char* encoded = Hex_Encode(result);
                         if (encoded != NULL) {
                             printf("%s\n", encoded);
                             ret = EXIT_SUCCESS;
@@ -168,7 +168,7 @@ int repeating_xor_cmd(int argc, char* argv[]) {
             if (result != NULL) {
                 int status = rp_xor(result, &key->buffer, &message->buffer);
                 if (status == XOR_SUCCESS) {
-                    char* encoded = Hex_Encode(result->data, result->length);
+                    char* encoded = Hex_Encode(result);
                     if (encoded != NULL) {
                         printf("%s\n", encoded);
                         ret = EXIT_SUCCESS;

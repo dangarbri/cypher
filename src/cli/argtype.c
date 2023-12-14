@@ -10,13 +10,17 @@
  * Parses hex data into a binary arg
  */
 struct Arg* Argtype_Hex(char* hex) {
-    struct HexData data = Hex_Decode(hex);
-    if (data.valid) {
+    struct Buffer* data = Hex_Decode(hex);
+    if (data) {
         struct Arg *arg = malloc(sizeof(struct Arg));
         if (arg != NULL) {
             arg->type = ARGTYPE_BINARY;
-            arg->buffer.data = data.data;
-            arg->buffer.length = data.length;
+            arg->buffer.data = data->data;
+            arg->buffer.length = data->length;
+            // claim ownership of the underlying buffer
+            // and free the rest.
+            data->data = NULL;
+            Buffer_Free(data);
             return arg;
         } else {
             perror("Argtype_Hex: ");

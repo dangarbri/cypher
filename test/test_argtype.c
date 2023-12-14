@@ -36,7 +36,8 @@ void test_Argtype_Parse_Base64() {
 }
 
 void test_Argtype_Parse_File() {
-    struct Arg* arg = Argtype_New("file:test_data/cypher");
+    char fname[] = "file:test_data/cypher";
+    struct Arg* arg = Argtype_New(fname);
     assert(arg != NULL);
     assert(arg->type == ARGTYPE_BINARY);
     assert(arg->buffer.length == 14);

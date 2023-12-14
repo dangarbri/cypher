@@ -9,36 +9,23 @@
 /**
  * Parses hex data into a binary arg
  */
-struct Arg* Argtype_Hex(char* hex) {
+struct Buffer* Argtype_Hex(char* hex) {
     struct Buffer* data = Hex_Decode(hex);
     if (data) {
-        struct Arg *arg = malloc(sizeof(struct Arg));
-        if (arg != NULL) {
-            arg->type = ARGTYPE_BINARY;
-            arg->buffer.data = data->data;
-            arg->buffer.length = data->length;
-            // claim ownership of the underlying buffer
-            // and free the rest.
-            data->data = NULL;
-            Buffer_Free(data);
-            return arg;
-        } else {
-            perror("Argtype_Hex: ");
-        }
+        return data;
     } else {
         fprintf(stderr, "Unable to parse hex: `%s`\n", hex);
     }
     return NULL;
 }
 
-struct Arg* Argtype_Base64(char* base64) {
+struct Buffer* Argtype_Base64(char* base64) {
     struct Base64Data decoded = Base64_Decode(base64);
     if (decoded.valid) {
-        struct Arg *arg = malloc(sizeof(struct Arg));
+        struct Buffer *arg = malloc(sizeof(struct Buffer));
         if (arg != NULL) {
-            arg->type = ARGTYPE_BINARY;
-            arg->buffer.data = decoded.data;
-            arg->buffer.length = decoded.length;
+            arg->data = decoded.data;
+            arg->length = decoded.length;
             return arg;
         } else {
             perror("Argtype_Base64: ");
@@ -49,15 +36,10 @@ struct Arg* Argtype_Base64(char* base64) {
     return NULL;
 }
 
-struct Arg* Argtype_File(char* fname) {
+struct Buffer* Argtype_File(char* fname) {
     if (fname == NULL) { return NULL; }
-    struct Arg* arg = malloc(sizeof(struct Arg));
-    if (arg == NULL) {
-        return NULL;
-    }
-    arg->type = ARGTYPE_BINARY;
-    arg->buffer.data = NULL;
 
+    struct Buffer* arg = NULL;
     bool failure = true;
     FILE* fp = fopen(fname, "rb");
     if (fp != NULL) {
@@ -66,13 +48,12 @@ struct Arg* Argtype_File(char* fname) {
             long filesize = ftell(fp);
             if (filesize != -1) {
                 // Allocate enough bytes to hold the entire file
-                arg->buffer.data = malloc(filesize);
-                if (arg->buffer.data != NULL) {
-                    arg->buffer.length = (size_t) filesize;
+                arg = Buffer_New(filesize);
+                if (Buffer_IsValid(arg)) {
                     // Read in the entire file
                     rewind(fp);
-                    size_t bytes_read = fread(arg->buffer.data, 1, arg->buffer.length, fp);
-                    if (bytes_read == arg->buffer.length) {
+                    size_t bytes_read = fread(arg->data, 1, arg->length, fp);
+                    if (bytes_read == arg->length) {
                         // Everying is okay!
                         failure = false;
                     }
@@ -90,48 +71,52 @@ struct Arg* Argtype_File(char* fname) {
 
     // On failure, free up allocated resources
     if (failure) {
-        Argtype_Free(arg);
+        Buffer_Free(arg);
         arg = NULL;
     }
     return arg;
 }
 
-struct Arg* Argtype_B64File(char* fname) {
+struct Buffer* Argtype_B64File(char* fname) {
     if (fname == NULL) { return NULL; }
     // Read in the file
-    struct Arg* file = Argtype_File(fname);
+    struct Buffer* file = Argtype_File(fname);
     if (file == NULL) {
         return NULL;
     }
     // Base64 decode the file into a new arg
-    struct Base64Data decoded = Base64_Decode((char*) file->buffer.data);
+    struct Base64Data decoded = Base64_Decode((char*) file->data);
     Argtype_Free(file);
     if (decoded.valid) {
-        struct Arg* decoded_file = malloc(sizeof(struct Arg));
+        struct Buffer* decoded_file = malloc(sizeof(struct Buffer));
         if (decoded_file != NULL) {
-            decoded_file->buffer.data = decoded.data;
-            decoded_file->buffer.length = decoded.length;
-            decoded_file->type = ARGTYPE_BINARY;
+            decoded_file->data = decoded.data;
+            decoded_file->length = decoded.length;
             return decoded_file;
         }
     }
     return NULL;
 }
 
-struct Arg* Argtype_String(char* arg) {
-    struct Arg* result = malloc(sizeof(struct Arg));
-    if (result != NULL) {
-        result->type = ARGTYPE_STRING;
-        result->buffer.data = (uint8_t*) arg;
-        result->buffer.length = strlen(arg);
+struct Buffer* Argtype_String(char* arg) {
+    // Buffer functions expect this data to be dynamically allocated.
+    // i.e. Buffer_Resize attempts to resize this data pointer, so
+    // arg cannot be set to the buffer's data
+    size_t size = strlen(arg) + 1;
+    struct Buffer* result = Buffer_New(size);
+    if (Buffer_IsValid(result)) {
+        // copy the input string into the buffer and return the result.
+        memcpy(result->data, arg, result->length);
+        // the null byte is there, but for strings args we only care about the text.
+        result->length -= 1;
         return result;
     } else {
-        perror("Argtype_String: ");
+        perror("Argtype_String");
     }
     return NULL;
 }
 
-struct Arg* Argtype_New(char* arg) {
+struct Buffer* Argtype_New(char* arg) {
     char* delim = ":";
     char* type = strtok(arg, delim);
     if (type == NULL) {
@@ -154,11 +139,6 @@ struct Arg* Argtype_New(char* arg) {
     }
 }
 
-void Argtype_Free(struct Arg* arg) {
-    if (arg->type == ARGTYPE_BINARY) {
-        if (arg->buffer.data != NULL) {
-            free(arg->buffer.data);
-        }
-    }
-    free(arg);
+void Argtype_Free(struct Buffer* arg) {
+    Buffer_Free(arg);
 }

@@ -28,20 +28,20 @@ void test_Xor() {
 void test_RepeatingXor() {
     char* message = "Burning 'em, if you ain't quick and nimble";
     char expected[] = "hex:0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272a282b2f20";
-    struct Arg* message_data = Argtype_New(message);
+    struct Buffer* message_data = Argtype_New(message);
     assert(message_data != NULL);
-    struct Arg* expected_data = Argtype_New(expected);
+    struct Buffer* expected_data = Argtype_New(expected);
     assert(expected_data != NULL);
-    assert(message_data->buffer.length == expected_data->buffer.length);
-    struct Buffer* result = Buffer_New(message_data->buffer.length);
+    assert(message_data->length == expected_data->length);
+    struct Buffer* result = Buffer_New(message_data->length);
     assert(result != NULL);
     struct Buffer key = {
         .data = (uint8_t*) "ICE",
         .length = 3
     };
     assert(message_data != NULL);
-    assert(rp_xor(result, &key, &message_data->buffer) == XOR_SUCCESS);
-    assert(memcmp(expected_data->buffer.data, result->data, result->length) == 0);
+    assert(rp_xor(result, &key, message_data) == XOR_SUCCESS);
+    assert(memcmp(expected_data->data, result->data, result->length) == 0);
     Buffer_Free(result);
     Argtype_Free(expected_data);
     Argtype_Free(message_data);

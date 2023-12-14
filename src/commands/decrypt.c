@@ -42,13 +42,13 @@ int DecryptAes128ECB(int argc, char* argv[]) {
         return 1;
     }
     int status = 1;
-    struct Arg* key = Argtype_New(argv[1]);
+    struct Buffer* key = Argtype_New(argv[1]);
     if (key != NULL) {
-        if (key->buffer.length == 16) {
-            struct Arg* cipher = Argtype_New(argv[2]);
+        if (key->length == 16) {
+            struct Buffer* cipher = Argtype_New(argv[2]);
             if (cipher != NULL) {
-                if ((cipher->buffer.length % 16) == 0) {
-                    struct Buffer* result = Aes128Ecb_Decrypt(&key->buffer, &cipher->buffer);
+                if ((cipher->length % 16) == 0) {
+                    struct Buffer* result = Aes128Ecb_Decrypt(key, cipher);
                     if (result != NULL) {
                         fwrite(result->data, 1, result->length, stdout);
                         fflush(stdout);
@@ -58,12 +58,12 @@ int DecryptAes128ECB(int argc, char* argv[]) {
                         fputs("Failed to decrypt the ciphertext\n", stderr);
                     }
                 } else {
-                    fprintf(stderr, "Invalid ciphertext size. %zu %% 16 != 0\n", cipher->buffer.length);
+                    fprintf(stderr, "Invalid ciphertext size. %zu %% 16 != 0\n", cipher->length);
                 }
                 Argtype_Free(cipher);
             }
         } else {
-            fprintf(stderr, "Invalid key size. Got %zu bytes, expected 16.\n", key->buffer.length);
+            fprintf(stderr, "Invalid key size. Got %zu bytes, expected 16.\n", key->length);
         }
         Argtype_Free(key);
     }

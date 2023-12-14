@@ -36,10 +36,10 @@ int PrintInput(int argc, char* argv[]) {
             return EXIT_FAILURE;
         }
     }
-    struct Arg* arg = Argtype_New(argv[arg_index]);
+    struct Buffer* arg = Argtype_New(argv[arg_index]);
     if (arg != NULL) {
-        for (size_t i = 0; i < arg->buffer.length; i++) {
-            printf("%c", arg->buffer.data[i]);
+        for (size_t i = 0; i < arg->length; i++) {
+            printf("%c", arg->data[i]);
         }
         Argtype_Free(arg);
         if (newline) {

@@ -6,42 +6,38 @@
 
 void test_Argtype_Parse() {
     char* basic = "Hello";
-    struct Arg* arg = Argtype_New(basic);
+    struct Buffer* arg = Argtype_New(basic);
     assert(arg != NULL);
-    assert(arg->type == ARGTYPE_STRING);
-    assert(basic == (char*) arg->buffer.data);
+    assert(basic != (char*) arg->data);
     Argtype_Free(arg);
 }
 
 void test_Argtype_Parse_Hex() {
     char hex[] = "hex:1234";
-    struct Arg* arg = Argtype_New(hex);
+    struct Buffer* arg = Argtype_New(hex);
     assert(arg != NULL);
-    assert(arg->type == ARGTYPE_BINARY);
-    assert(arg->buffer.length == 2);
-    assert(arg->buffer.data[0] == 0x12);
-    assert(arg->buffer.data[1] == 0x34);
+    assert(arg->length == 2);
+    assert(arg->data[0] == 0x12);
+    assert(arg->data[1] == 0x34);
     Argtype_Free(arg);
 }
 
 void test_Argtype_Parse_Base64() {
     // "Hello"
     char base64[] = "base64:SGVsbG8=";
-    struct Arg* arg = (struct Arg*) Argtype_New(base64);
+    struct Buffer* arg = (struct Buffer*) Argtype_New(base64);
     assert(arg != NULL);
-    assert(arg->type == ARGTYPE_BINARY);
-    assert(arg->buffer.length == 5);
-    assert(strncmp((char*) arg->buffer.data, "Hello", 5) == 0);
-    Argtype_Free((struct Arg*) arg);
+    assert(arg->length == 5);
+    assert(strncmp((char*) arg->data, "Hello", 5) == 0);
+    Argtype_Free((struct Buffer*) arg);
 }
 
 void test_Argtype_Parse_File() {
     char fname[] = "file:test_data/cypher";
-    struct Arg* arg = Argtype_New(fname);
+    struct Buffer* arg = Argtype_New(fname);
     assert(arg != NULL);
-    assert(arg->type == ARGTYPE_BINARY);
-    assert(arg->buffer.length == 14);
-    assert(strncmp("Hello, cypher\n", (char*) arg->buffer.data, 14) == 0);
+    assert(arg->length == 14);
+    assert(strncmp("Hello, cypher\n", (char*) arg->data, 14) == 0);
     Argtype_Free(arg);
 }
 

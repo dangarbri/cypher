@@ -56,11 +56,11 @@ void AnalyzeUsage() {
 
 int Analyze(char* message) {
     int result = EXIT_FAILURE;
-    struct Arg* arg = Argtype_New(message);
+    struct Buffer* arg = Argtype_New(message);
     if (arg != NULL) {
         struct RegisteredAnalyzer* analyzer = &RegisteredAnalyzers[0];
         while (analyzer->fn != NULL) {
-            float score = analyzer->fn(&arg->buffer);
+            float score = analyzer->fn(arg);
             printf("%-15s | %.04f\n", analyzer->name, score);
             analyzer += 1;
         }

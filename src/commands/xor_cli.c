@@ -36,14 +36,14 @@ void xor_usage() {
 
 int perform_xor(char* a, char* b) {
     int ret = EXIT_FAILURE;
-    struct Arg* left = Argtype_New(a);
+    struct Buffer* left = Argtype_New(a);
     if (left != NULL) {
-        struct Arg* right = Argtype_New(b);
+        struct Buffer* right = Argtype_New(b);
         if (right != NULL) {
-            if (left->buffer.length == right->buffer.length) {
-                struct Buffer* result = Buffer_New(right->buffer.length);
+            if (left->length == right->length) {
+                struct Buffer* result = Buffer_New(right->length);
                 if (result != NULL) {
-                    enum XorResult xor_result = xor(result, &left->buffer, &right->buffer);
+                    enum XorResult xor_result = xor(result, left, right);
                     if (xor_result == XOR_SUCCESS) {
                         char* encoded = Hex_Encode(result);
                         if (encoded != NULL) {
@@ -59,7 +59,7 @@ int perform_xor(char* a, char* b) {
                     perror("xor_cli: ");
                 }
             } else {
-                fprintf(stderr, "Left and right arguments are not the same length (%zu != %zu)\n", left->buffer.length, right->buffer.length);
+                fprintf(stderr, "Left and right arguments are not the same length (%zu != %zu)\n", left->length, right->length);
             }
             Argtype_Free(right);
         }
@@ -70,14 +70,14 @@ int perform_xor(char* a, char* b) {
 
 int perform_sbx(char* a, char* b) {
     int ret = EXIT_FAILURE;
-    struct Arg* left = Argtype_New(a);
+    struct Buffer* left = Argtype_New(a);
     if (left != NULL) {
-        struct Arg* right = Argtype_New(b);
+        struct Buffer* right = Argtype_New(b);
         if (right != NULL) {
-            if (left->buffer.length == 1) {
-                struct Buffer* result = Buffer_New(right->buffer.length);
+            if (left->length == 1) {
+                struct Buffer* result = Buffer_New(right->length);
                 if (result != NULL) {
-                    if (sb_xor(result, *left->buffer.data, &right->buffer) == XOR_SUCCESS) {
+                    if (sb_xor(result, *left->data, right) == XOR_SUCCESS) {
                         char* encoded = Hex_Encode(result);
                         if (encoded != NULL) {
                             printf("%s\n", encoded);
@@ -88,7 +88,7 @@ int perform_sbx(char* a, char* b) {
                     Buffer_Free(result);
                 }
             } else {
-                fprintf(stderr, "Left argument must be 1 byte long. Got %zu bytes\n", left->buffer.length);
+                fprintf(stderr, "Left argument must be 1 byte long. Got %zu bytes\n", left->length);
             }
             Argtype_Free(right);
         }
@@ -160,13 +160,13 @@ int repeating_xor_cmd(int argc, char* argv[]) {
         return EXIT_FAILURE;
     }
     int ret = EXIT_FAILURE;
-    struct Arg* key = Argtype_New(argv[1]);
+    struct Buffer* key = Argtype_New(argv[1]);
     if (key != NULL) {
-        struct Arg* message = Argtype_New(argv[2]);
+        struct Buffer* message = Argtype_New(argv[2]);
         if (message != NULL) {
-            struct Buffer* result = Buffer_New(message->buffer.length);
+            struct Buffer* result = Buffer_New(message->length);
             if (result != NULL) {
-                int status = rp_xor(result, &key->buffer, &message->buffer);
+                int status = rp_xor(result, key, message);
                 if (status == XOR_SUCCESS) {
                     char* encoded = Hex_Encode(result);
                     if (encoded != NULL) {

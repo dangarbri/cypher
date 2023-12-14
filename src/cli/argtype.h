@@ -14,24 +14,6 @@
 #include "types/buffer.h"
 
 /**
- * Represents the type of the input argument
- */
-enum ArgType {
-    ARGTYPE_STRING,
-    ARGTYPE_BINARY,
-};
-
-/**
- * Argument structure containing arg type and arg type metadata
- */
-struct Arg {
-    /** Type of argument */
-    enum ArgType type;
-    /** Processed argument data */
-    struct Buffer buffer;
-};
-
-/**
  * Parses the given argument into an arg struct.
  * Free this data with Argtype_Free
  *
@@ -41,11 +23,11 @@ struct Arg {
  * @param arg Input argument to check
  * @return parsed arg or NULL on error.
  */
-struct Arg* Argtype_New(char* arg);
+struct Buffer* Argtype_New(char* arg);
 
 /**
  * Free memory allocated with Argtype_New
  */
-void Argtype_Free(struct Arg* arg);
+void Argtype_Free(struct Buffer* arg);
 
 #endif

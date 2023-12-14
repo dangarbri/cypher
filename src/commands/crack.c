@@ -74,14 +74,14 @@ int CrackCli_SingleByteXor(int argc, char* argv[]) {
         puts("From there you can inspect the xor'd 'plaintexts' manually.");
         return EXIT_FAILURE;
     } else {
-        struct Arg* arg = Argtype_New(data);
+        struct Buffer* arg = Argtype_New(data);
         if (arg != NULL) {
-            struct PotentialKeys keys = CrackSBX(&arg->buffer, English_Analyzer, verbose);
+            struct PotentialKeys keys = CrackSBX(arg, English_Analyzer, verbose);
             printf("Potential Keys:\n");
-            struct Buffer* pt = Buffer_New(arg->buffer.length);
+            struct Buffer* pt = Buffer_New(arg->length);
             if (pt != NULL) {
                 for (int i = 0; i < 5; i++) {
-                    if (sb_xor(pt, keys.keys[i], &arg->buffer) == XOR_SUCCESS) {
+                    if (sb_xor(pt, keys.keys[i], arg) == XOR_SUCCESS) {
                         if (pt != NULL) {
                             printf("  0x%02X | Score %.02f | Message: %s\n", keys.keys[i], keys.scores[i], pt->data);
                         } else {
@@ -138,9 +138,9 @@ int CrackCLI_RepeatingXor(int argc, char* argv[]) {
         keymax = (size_t) user_keymax;
     }
 
-    struct Arg* arg = Argtype_New(argv[ciphertext_index]);
+    struct Buffer* arg = Argtype_New(argv[ciphertext_index]);
     if (arg != NULL) {
-        struct RepeatingXorKeys* keys = CrackRepeatingXor(keymin, keymax, &arg->buffer, English_Analyzer, verbose);
+        struct RepeatingXorKeys* keys = CrackRepeatingXor(keymin, keymax, arg, English_Analyzer, verbose);
         // CrackRepeatingXor prints the summary already if verbose is true
         if (!verbose) {
             CrackRBX_PrintSummary(keys);

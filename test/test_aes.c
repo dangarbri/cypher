@@ -6,18 +6,18 @@
 
 void test_AesEncrypt() {
     char KEY[] = "YELLOW SUBMARINE";
-    struct Arg* key = Argtype_New(KEY);
+    struct Buffer* key = Argtype_New(KEY);
     assert(key != NULL);
     char ciphertext[] = "file:test_data/cypher_enc";
-    struct Arg* expected_result = Argtype_New(ciphertext);
+    struct Buffer* expected_result = Argtype_New(ciphertext);
     assert(expected_result != NULL);
     char plaintext[] = "file:test_data/cypher";
-    struct Arg* pt = Argtype_New(plaintext);
+    struct Buffer* pt = Argtype_New(plaintext);
     assert(pt != NULL);
-    struct Buffer* encrypted = Aes128Ecb_Encrypt(&key->buffer, &pt->buffer);
+    struct Buffer* encrypted = Aes128Ecb_Encrypt(key, pt);
     assert(encrypted != NULL);
-    assert(encrypted->length == expected_result->buffer.length);
-    assert(memcmp(encrypted->data, expected_result->buffer.data, expected_result->buffer.length) == 0);
+    assert(encrypted->length == expected_result->length);
+    assert(memcmp(encrypted->data, expected_result->data, expected_result->length) == 0);
     Argtype_Free(key);
     Argtype_Free(expected_result);
     Argtype_Free(pt);
@@ -26,18 +26,18 @@ void test_AesEncrypt() {
 
 void test_AesDecrypt() {
     char KEY[] = "YELLOW SUBMARINE";
-    struct Arg* key = Argtype_New(KEY);
+    struct Buffer* key = Argtype_New(KEY);
     assert(key != NULL);
     char ciphertext[] = "file:test_data/cypher_enc";
-    struct Arg* ct = Argtype_New(ciphertext);
+    struct Buffer* ct = Argtype_New(ciphertext);
     assert(ct != NULL);
     char plaintext[] = "file:test_data/cypher";
-    struct Arg* pt = Argtype_New(plaintext);
+    struct Buffer* pt = Argtype_New(plaintext);
     assert(pt != NULL);
-    struct Buffer* decrypted = Aes128Ecb_Decrypt(&key->buffer, &ct->buffer);
+    struct Buffer* decrypted = Aes128Ecb_Decrypt(key, ct);
     assert(decrypted != NULL);
-    assert(decrypted->length == pt->buffer.length);
-    assert(memcmp(decrypted->data, pt->buffer.data, pt->buffer.length) == 0);
+    assert(decrypted->length == pt->length);
+    assert(memcmp(decrypted->data, pt->data, pt->length) == 0);
     Argtype_Free(key);
     Argtype_Free(ct);
     Argtype_Free(pt);
@@ -46,13 +46,13 @@ void test_AesDecrypt() {
 
 void test_AesDecryptGarbage() {
     char KEY[] = "YELLOW SUBMARINE";
-    struct Arg* key = Argtype_New(KEY);
+    struct Buffer* key = Argtype_New(KEY);
     assert(key != NULL);
     char plaintext[] = "file:test_data/cypher";
-    struct Arg* pt = Argtype_New(plaintext);
+    struct Buffer* pt = Argtype_New(plaintext);
     assert(pt != NULL);
     // Attempt to decrypt the plaintext, which should fail
-    struct Buffer* decrypted = Aes128Ecb_Decrypt(&key->buffer, &pt->buffer);
+    struct Buffer* decrypted = Aes128Ecb_Decrypt(key, pt);
     assert(decrypted == NULL);
     Argtype_Free(key);
     Argtype_Free(pt);

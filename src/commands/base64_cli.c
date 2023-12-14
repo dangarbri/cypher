@@ -49,11 +49,11 @@ int b64_encode(int argc, char** argv) {
         fputs("Missing argument\n", stderr);
         return EXIT_FAILURE;
     }
-    struct Arg* arg = Argtype_New(argv[1]);
+    struct Buffer* arg = Argtype_New(argv[1]);
     if (arg == NULL) {
         return EXIT_FAILURE;
     }
-    struct Base64Data data = Base64_Encode((uint8_t*) arg->buffer.data, arg->buffer.length);
+    struct Base64Data data = Base64_Encode((uint8_t*) arg->data, arg->length);
     Argtype_Free(arg);
     if (!data.valid) {
         fputs("Sorry, I couldn't encode that!\n", stderr);
@@ -69,11 +69,11 @@ int b64_decode(int argc, char** argv) {
         fputs("Missing argument\n", stderr);
         return EXIT_FAILURE;
     }
-    struct Arg* arg = Argtype_New(argv[1]);
+    struct Buffer* arg = Argtype_New(argv[1]);
     if (arg == NULL) {
         return EXIT_FAILURE;
     }
-    struct Base64Data data = Base64_Decode((char*) arg->buffer.data);
+    struct Base64Data data = Base64_Decode((char*) arg->data);
     Argtype_Free(arg);
     if (!data.valid) {
         fputs("Sorry, I couldn't decode that!\n", stderr);

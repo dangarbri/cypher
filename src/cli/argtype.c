@@ -46,6 +46,7 @@ struct Arg* Argtype_Base64(char* base64) {
 }
 
 struct Arg* Argtype_File(char* fname) {
+    if (fname == NULL) { return NULL; }
     struct Arg* arg = malloc(sizeof(struct Arg));
     if (arg == NULL) {
         return NULL;
@@ -88,6 +89,28 @@ struct Arg* Argtype_File(char* fname) {
     return arg;
 }
 
+struct Arg* Argtype_B64File(char* fname) {
+    if (fname == NULL) { return NULL; }
+    // Read in the file
+    struct Arg* file = Argtype_File(fname);
+    if (file == NULL) {
+        return NULL;
+    }
+    // Base64 decode the file into a new arg
+    struct Base64Data decoded = Base64_Decode((char*) file->buffer.data);
+    Argtype_Free(file);
+    if (decoded.valid) {
+        struct Arg* decoded_file = malloc(sizeof(struct Arg));
+        if (decoded_file != NULL) {
+            decoded_file->buffer.data = decoded.data;
+            decoded_file->buffer.length = decoded.length;
+            decoded_file->type = ARGTYPE_BINARY;
+            return decoded_file;
+        }
+    }
+    return NULL;
+}
+
 struct Arg* Argtype_String(char* arg) {
     struct Arg* result = malloc(sizeof(struct Arg));
     if (result != NULL) {
@@ -104,15 +127,21 @@ struct Arg* Argtype_String(char* arg) {
 struct Arg* Argtype_New(char* arg) {
     char* delim = ":";
     char* type = strtok(arg, delim);
+    if (type == NULL) {
+        return NULL;
+    }
     if (strncmp("hex", type, 3) == 0) {
         char* data = strtok(NULL, delim);
-        return (struct Arg*) Argtype_Hex(data);
+        return Argtype_Hex(data);
     } else if (strncmp("base64", type, 6) == 0) {
         char* data = strtok(NULL, delim);
-        return (struct Arg*) Argtype_Base64(data);
+        return Argtype_Base64(data);
+    } else if (strncmp("file.b64", type, 8) == 0) {
+        char* fname = strtok(NULL, delim);
+        return Argtype_B64File(fname);
     } else if (strncmp("file", type, 4) == 0) {
         char* fname = strtok(NULL, delim);
-        return (struct Arg*) Argtype_File(fname);
+        return Argtype_File(fname);
     } else {
         return Argtype_String(arg);
     }

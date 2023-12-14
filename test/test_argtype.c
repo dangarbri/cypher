@@ -40,7 +40,7 @@ void test_Argtype_Parse_File() {
     assert(arg != NULL);
     assert(arg->type == ARGTYPE_BINARY);
     assert(arg->buffer.length == 14);
-    assert(strncmp("Hello, cypher\n", arg->buffer.data, 14) == 0);
+    assert(strncmp("Hello, cypher\n", (char*) arg->buffer.data, 14) == 0);
     Argtype_Free(arg);
 }
 

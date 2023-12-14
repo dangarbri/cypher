@@ -13,7 +13,7 @@ void PrintInput_Usage() {
          "Supports hex: and base64: prefixed inputs.\n"
          "\n"
          "Options:\n"
-         "  -n    Print newline character at the end");
+         "  -n    Don't print a newline character at the end");
 }
 
 int PrintInput(int argc, char* argv[]) {
@@ -22,14 +22,14 @@ int PrintInput(int argc, char* argv[]) {
         return EXIT_SUCCESS;
     }
     int arg_index = 1;
-    bool newline = false;
+    bool newline = true;
     if (strncmp(argv[1], "-n", 2) == 0) {
         if (argc != 3) {
             puts("Missing argument");
             return EXIT_FAILURE;
         }
         arg_index = 2;
-        newline = true;
+        newline = false;
     } else {
         if (argc != 2) {
             puts("Too many args");

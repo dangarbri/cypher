@@ -26,6 +26,14 @@ int print_help(int argc, char* argv[]) {
     puts("This program may be used to exploit cryptographic");
     puts("deficiencies as demonstrated in the cryptopals challenges");
     puts("");
+    puts("A lot of crypto operations operate on binary data, not just ascii plaintext.");
+    puts("You can enter binary data in a variety of ways:");
+    puts("  - a string as is, such as \"Hello, world!\"");
+    puts("  - hex encoded data like hex:48656c6c6f2c20776f726c6421");
+    puts("  - base64 encoded data like base64:SGVsbG8sIHdvcmxkIQ==");
+    puts("  - Data from a file via file:name_of_file");
+    puts("  - Base64 encoded data from a file via file.b64:name_of_file");
+    puts("");
     puts("COMMANDS:");
     Subcommand_PrintHelp(commands);
     return 0;

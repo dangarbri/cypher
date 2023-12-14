@@ -217,6 +217,7 @@ struct Buffer* CrackRepeatingXor_WithKeyLength(size_t keylength, const struct Bu
             } else {
                 fputs("Error streaming log buffer to stdout\n", stderr);
             }
+            free(buf);
         } else {
             fputs("Couldn't allocate memory, logs are gone\n", stderr);
         }

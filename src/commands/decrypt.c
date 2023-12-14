@@ -2,6 +2,7 @@
 
 #include "cli/argtype.h"
 #include "cli/subcommand.h"
+#include "operations/aes.h"
 #include "decrypt.h"
 
 int DecryptAes128ECB(int argc, char* argv[]);
@@ -47,8 +48,13 @@ int DecryptAes128ECB(int argc, char* argv[]) {
             struct Arg* cipher = Argtype_New(argv[2]);
             if (cipher != NULL) {
                 if ((cipher->buffer.length % 16) == 0) {
-                    puts("TODO: Implement aes encryption");
-                    status = 0;
+                    struct Buffer* result = Aes128Ecb_Decrypt(&key->buffer, &cipher->buffer);
+                    if (result != NULL) {
+                        fwrite(result->data, 1, result->length, stdout);
+                        fflush(stdout);
+                        Buffer_Free(result);
+                        status = 0;
+                    }
                 } else {
                     fprintf(stderr, "Invalid ciphertext size. %zu %% 16 != 0\n", cipher->buffer.length);
                 }

@@ -33,6 +33,7 @@ add_executable(cypher
   commands/decrypt.c
   commands/print.c
   commands/xor_cli.c
+  operations/aes.c
   operations/hamming.c
   operations/rank.c
   operations/xor.c

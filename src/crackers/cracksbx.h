@@ -1,6 +1,7 @@
 #ifndef _CRACKSBX_H_
 #define _CRACKSBX_H_
 
+#include <stdio.h>
 #include "analyzers/analyzer.h"
 
 struct PotentialKeys {
@@ -21,6 +22,6 @@ struct PotentialKeys CrackSBX(struct Buffer* buf, Analyzer analyzer, bool verbos
 /**
  * Prints the given keys to stdout
  */
-void CrackSBX_PrintKeys(struct PotentialKeys* keys);
+void CrackSBX_PrintKeys(struct PotentialKeys* keys, FILE* stream);
 
 #endif

@@ -1,3 +1,4 @@
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -66,7 +67,6 @@ struct ThreadPoolManagerArgs {
 
 int ThreadPool_QueueManager(void* ptr2arg) {
     struct ThreadPoolManagerArgs* args = (struct ThreadPoolManagerArgs*) ptr2arg;
-    puts("Started the queue manager!");
     for (size_t i = 0; i < args->queue->length; i++) {
         if (ThreadPool_SubmitJob(args->pool, &args->queue->info[i]) != thrd_success) {
             puts("Failed to submit job to the pool");
@@ -80,7 +80,6 @@ int ThreadPool_QueueManager(void* ptr2arg) {
         status = -1;
     }
     free(args);
-    puts("Exiting the queue manager!");
     return status;
 }
 
@@ -160,6 +159,34 @@ bool ThrdGood(thrd_t thread) {
     // This is here for cross platform support, thrd_t is unsigned long on linux and a struct on windows.
     return thrd_equal(thread, bad) == 0;
 }
+
+void Thread_printf (const char *format, ...) {
+    static bool initialized = false;
+    static mtx_t print_lock;
+    if (!initialized) {
+        if (mtx_init(&print_lock, mtx_plain) == thrd_success) {
+            initialized = true;
+        } else {
+            fputs("Failed to initialize printf mutex, expect interleaved output.\n", stderr);
+        }
+    }
+
+    va_list args;
+    va_start(args, format);
+    if (initialized) {
+        if (mtx_lock(&print_lock) != thrd_success) {
+            fputs("printf mutex lock failed...\n", stderr);
+        }
+    }
+    vprintf(format, args);
+    if (initialized) {
+        if (mtx_unlock(&print_lock) != thrd_success) {
+            fputs("printf mutex unlock failed...\n", stderr);
+        }
+    }
+    va_end(args);
+}
+
 #else
 // TODO: Implement single threaded "thread pool"
 #endif

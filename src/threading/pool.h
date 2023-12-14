@@ -95,4 +95,15 @@ void ThreadQueue_Free(struct ThreadQueue* queue);
  */
 bool ThrdGood(thrd_t thread);
 
+/**
+ * Call printf to write to stdout from a thread.
+ * This method synchronizes between all threads so that output
+ * cannot get interleaved.
+ *
+ * @note This makes sure threads don't print at the same time.
+ *       But if your threads are printing continuously, their output
+ *       may still be interleaved. i.e. A prints hello, B prints world, A prints bob.
+ */
+void Thread_printf (const char *format, ...);
+
 #endif

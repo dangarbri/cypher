@@ -153,10 +153,16 @@ struct Buffer* CrackRepeatingXor_WithKeyLength(size_t keylength, const struct Bu
     if ((keylength == 0) || (buf == NULL)) {
         return NULL;
     }
+    FILE* verbose_fp = NULL;
 
     if (verbose) {
-        printf("Testing key length %zu\n", keylength);
-        puts("");
+        verbose_fp = tmpfile();
+        if (verbose_fp == NULL) {
+            verbose_fp = stdout;
+            fputs("Failed to allocate tmpfile for de-interleaving thread output. Output will likely be scrambled", stderr);
+        }
+        fprintf(verbose_fp, "Testing key length %zu\n", keylength);
+        fputs("\n", verbose_fp);
     }
 
     /**
@@ -177,24 +183,42 @@ struct Buffer* CrackRepeatingXor_WithKeyLength(size_t keylength, const struct Bu
                 };
                 struct PotentialKeys cracked_keys = CrackSBX(&cipher, analyzer, false);
                 if (verbose) {
-                    printf("Byte %zu: ", i);
-                    CrackSBX_PrintKeys(&cracked_keys);
-                    puts("");
+                    fprintf(verbose_fp, "Byte %zu: ", i);
+                    CrackSBX_PrintKeys(&cracked_keys, verbose_fp);
+                    fputs("\n", verbose_fp);
                 }
                 key->data[i] = cracked_keys.keys[0];
             }
             if (verbose) {
                 char* keystr = Hex_Encode(key->data, key->length);
                 if (keystr != NULL) {
-                    printf("Possible key -> hex:%s\n", keystr);
+                    fprintf(verbose_fp, "Possible key -> hex:%s\n", keystr);
                     free(keystr);
                 }
             }
-            puts("---------------------------------------------");
             Buffer_Free(transposed);
         } else {
             Buffer_Free(key);
             key = NULL;
+        }
+    }
+
+    if (verbose) {
+        char null_terminator = '\0';
+        fwrite(&null_terminator, 1, 1, verbose_fp);
+        long size = ftell(verbose_fp);
+        char* buf = malloc((size_t) size);
+        if (buf != NULL) {
+            rewind(verbose_fp);
+            int bytes = fread(buf, 1, size, verbose_fp);
+            if (bytes > 0) {
+                Thread_printf("%s\n", buf);
+                fclose(verbose_fp);
+            } else {
+                fputs("Error streaming log buffer to stdout\n", stderr);
+            }
+        } else {
+            fputs("Couldn't allocate memory, logs are gone\n", stderr);
         }
     }
 

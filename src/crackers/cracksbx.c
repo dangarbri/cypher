@@ -88,12 +88,16 @@ struct PotentialKeys CrackSBX_Evaluate(float* scores) {
     return results;
 }
 
-void CrackSBX_PrintKeys(struct PotentialKeys* keys) {
+void CrackSBX_PrintKeys(struct PotentialKeys* keys, FILE* stream) {
+    FILE* output_stream = stdout;
+    if (stream != NULL) {
+        output_stream = stream;
+    }
     if (keys != NULL) {
         for (int i = 0; i < 5; i++) {
-            printf("0x%X", keys->keys[i]);
+            fprintf(output_stream, "0x%X", keys->keys[i]);
             if (i != 4) {
-                printf(", ");
+                fprintf(output_stream, ", ");
             }
         }
     }

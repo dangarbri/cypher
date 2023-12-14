@@ -3,7 +3,7 @@
 #include "aes.h"
 
 struct Buffer* Aes128Ecb(struct Buffer* key, struct Buffer* data, bool encrypt) {
-    if (!Buffer_IsValid(key) || !Buffer_IsValid(data) || (key->length != 16) || ((data->length % 16) != 0)) {
+    if (!Buffer_IsValid(key) || !Buffer_IsValid(data) || (key->length != 16)) {
         return NULL;
     }
 

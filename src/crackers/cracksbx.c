@@ -62,7 +62,7 @@ void CrackSBX_LogResult(struct Buffer* result, uint8_t key) {
     char* format = "cracksbx_%02X.txt";
     char fname[16];
     snprintf(fname, 16, format, key);
-    FILE* fp = fopen(fname, "w");
+    FILE* fp = fopen(fname, "wb");
     if (fp != NULL) {
         // Write data to the file
         fwrite(result->data, 1, result->length, fp);

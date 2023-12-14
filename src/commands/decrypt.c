@@ -54,6 +54,8 @@ int DecryptAes128ECB(int argc, char* argv[]) {
                         fflush(stdout);
                         Buffer_Free(result);
                         status = 0;
+                    } else {
+                        fputs("Failed to decrypt the ciphertext\n", stderr);
                     }
                 } else {
                     fprintf(stderr, "Invalid ciphertext size. %zu %% 16 != 0\n", cipher->buffer.length);

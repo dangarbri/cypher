@@ -140,6 +140,17 @@ add_executable(test_crackrbx
   threading/pool.c
   types/buffer.c
 )
+add_executable(test_aes
+  ../test/test_aes.c
+  cli/argtype.c
+  parsers/hex.c
+  parsers/base64.c
+  operations/aes.c
+  types/buffer.c
+)
+target_link_libraries(test_aes
+  LINK_PRIVATE ${Openssl_LIBRARIES}
+)
 
 add_test(NAME Subcommands COMMAND test_subcommand)
 add_test(NAME Parsers COMMAND test_parsers)
@@ -153,6 +164,7 @@ add_test(NAME CrackSBX COMMAND test_cracksbx)
 add_test(NAME CrackRBX COMMAND test_crackrbx)
 add_test(NAME Rank COMMAND test_rank)
 add_test(NAME Hamming COMMAND test_hamming)
+add_test(NAME AES COMMAND test_aes)
 add_test(NAME ThreadPool COMMAND test_threadpool)
 
 # Eventually will need to add openssl to this.

@@ -59,7 +59,7 @@ struct Arg* Argtype_File(char* fname) {
     arg->buffer.data = NULL;
 
     bool failure = true;
-    FILE* fp = fopen(fname, "r");
+    FILE* fp = fopen(fname, "rb");
     if (fp != NULL) {
         // Get size of file
         if(fseek(fp, 0, SEEK_END) == 0) {
@@ -83,6 +83,9 @@ struct Arg* Argtype_File(char* fname) {
         }
 
         fclose(fp);
+    } else {
+        fprintf(stderr, "Failed to open file %s: ", fname);
+        perror(NULL);
     }
 
     // On failure, free up allocated resources

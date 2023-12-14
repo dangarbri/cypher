@@ -42,6 +42,8 @@ add_executable(cypher
   threading/pool.c
   types/buffer.c
 )
+install(TARGETS cypher)
+
 include_directories(
   ../src
 )

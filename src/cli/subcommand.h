@@ -21,7 +21,7 @@ struct Subcommand {
     SubcommandFn fn;
 };
 
-#define SUBCOMMAND_NOT_FOUND -1
+#define SUBCOMMAND_NOT_FOUND -99
 
 /**
  * Find and run the given subcommand out of the list of available subcommands

@@ -30,6 +30,7 @@ add_executable(cypher
   commands/analyze.c
   commands/base64_cli.c
   commands/crack.c
+  commands/decrypt.c
   commands/print.c
   commands/xor_cli.c
   operations/hamming.c

@@ -3,6 +3,7 @@
 #include "commands/analyze.h"
 #include "commands/base64_cli.h"
 #include "commands/crack.h"
+#include "commands/decrypt.h"
 #include "commands/print.h"
 #include "commands/xor_cli.h"
 
@@ -13,6 +14,7 @@ struct Subcommand commands[] = {
     {"analyze", "analyze ciphertext", AnalyzeCmd},
     {"base64", "base64 encoding utilities", Base64},
     {"crack", "encryption cracking utilities", CrackCli},
+    {"decrypt", "Decryption utilities", Decrypt},
     {"print", "Print the input to stdout", PrintInput},
     {"xor", "xor on cli arguments", XorCmd},
     {NULL}
@@ -40,11 +42,14 @@ int print_help(int argc, char* argv[]) {
 }
 
 int main(int argc, char** argv) {
-    (void) argv;
     if (argc <= 1) {
         print_help(0, NULL);
         return 1;
     } else {
-        return Subcommand_Run(argv[1], commands, argc - 1, &argv[1]);
+        int result = Subcommand_Run(argv[1], commands, argc - 1, &argv[1]);
+        if (result == SUBCOMMAND_NOT_FOUND) {
+            fprintf(stderr, "Invalid command '%s'\n", argv[1]);
+        }
+        return result;
     }
 }

@@ -36,6 +36,7 @@ add_executable(cypher
   commands/xor_cli.c
   operations/aes.c
   operations/hamming.c
+  operations/pad.c
   operations/rank.c
   operations/xor.c
   parsers/base64.c
@@ -151,6 +152,8 @@ add_executable(test_aes
   parsers/hex.c
   parsers/base64.c
   operations/aes.c
+  operations/pad.c
+  operations/xor.c
   types/buffer.c
 )
 # target_link_libraries(test_aes

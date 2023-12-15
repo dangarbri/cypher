@@ -48,12 +48,19 @@ struct Buffer* Argtype_File(char* fname) {
             long filesize = ftell(fp);
             if (filesize != -1) {
                 // Allocate enough bytes to hold the entire file
-                arg = Buffer_New(filesize);
+                // plus 1 to put a null byte at the end.
+                // The null byte is there in case the file is a text file.
+                // Without terminating the last byte an operation like strlen could
+                // read out of bounds.
+                arg = Buffer_New(filesize + 1);
                 if (Buffer_IsValid(arg)) {
                     // Read in the entire file
                     rewind(fp);
-                    size_t bytes_read = fread(arg->data, 1, arg->length, fp);
-                    if (bytes_read == arg->length) {
+                    size_t bytes_read = fread(arg->data, 1, filesize, fp);
+                    if (bytes_read == (arg->length - 1)) {
+                        arg->data[bytes_read] = '\0';
+                        // Leave the null byte, but say the length is only the length of the data.
+                        arg->length -= 1;
                         // Everying is okay!
                         failure = false;
                     }

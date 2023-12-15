@@ -4,6 +4,7 @@
 
 float ECB_Analyzer(struct Buffer* buffer, size_t blocksize) {
     if (!Buffer_IsValid(buffer)) { return 0.0f; }
+    if (buffer->length < blocksize) { return 0.0f; }
     size_t n_blocks = buffer->length / blocksize;
     size_t dupe_count = 0;
     for (size_t i = 0; i < (n_blocks - 1); i++) {

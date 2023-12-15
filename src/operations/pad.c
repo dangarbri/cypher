@@ -3,8 +3,8 @@
 
 #include "pad.h"
 
-#define SUCCESS 0
-#define FAILURE 1
+#define SUCCESS 1
+#define FAILURE 0
 
 int PKCS7_Pad(struct Buffer* buf, size_t blocksize) {
     // return failure if buffer or blocksize are invalid

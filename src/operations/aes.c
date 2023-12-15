@@ -74,7 +74,7 @@ struct Buffer* Aes128Cbc_Encrypt(struct Buffer* key, struct Buffer* iv, struct B
     if (!Buffer_IsValid(key) || !Buffer_IsValid(iv) || !Buffer_IsValid(data) || (key->length != blocksize) || (iv->length != blocksize)) {
         return NULL;
     }
-    if (PKCS7_Pad(data, blocksize) == 1) {
+    if (PKCS7_Pad(data, blocksize) == 0) {
         fputs("Padding failed\n", stderr);
         return NULL;
     }
@@ -177,6 +177,14 @@ struct Buffer* Aes128Cbc_Decrypt(struct Buffer* key, struct Buffer* iv, struct B
     if (failure) {
         Buffer_Free(decrypted);
         decrypted = NULL;
+    } else {
+        if ((decrypted->length % blocksize) != 0) {
+            if (PKCS7_Unpad(decrypted) != 1) {
+                fputs("Invalid padding\n", stderr);
+                Buffer_Free(decrypted);
+                decrypted = NULL;
+            }
+        }
     }
 
     return decrypted;

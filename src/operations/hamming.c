@@ -22,7 +22,7 @@ size_t GetHammingDistance(struct Buffer* a, struct Buffer* b) {
  */
 uint8_t GetHammingWeight(uint8_t n)
 {
-    size_t count = 0;
+    uint8_t count = 0;
     while (n != 0) {
         ++count;
         n &= n - 1; /* clear least significant bit */

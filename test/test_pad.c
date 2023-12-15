@@ -1,3 +1,4 @@
+#undef NDEBUG
 #include <assert.h>
 #include <string.h>
 #include "cli/argtype.h"

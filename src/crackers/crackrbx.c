@@ -51,46 +51,50 @@ struct RepeatingXorKeys* CrackRepeatingXor(size_t keymin, size_t keymax, struct 
     struct ThreadPool* pool = ThreadPool_New(5);
     if (pool != NULL) {
         struct ThreadQueue* queue = ThreadQueue_New(num_keys_to_test);
-        struct CrackRbxThreadArgs args[num_keys_to_test];
-        if (queue != NULL) {
-            keylist = malloc(sizeof(struct RepeatingXorKeys));
-            if (keylist != NULL) {
-                keylist->keys = calloc(num_keys_to_test, sizeof(keylist->keys));
-                bool failure = true;
-                if (keylist->keys != NULL) {
-                    keylist->length = num_keys_to_test;
-                    for (size_t i = 0; i < num_keys_to_test; i++) {
-                        args[i].analyzer = analyzer;
-                        args[i].buf = buf;
-                        args[i].keylength = rank.keysize[i];
-                        args[i].verbose = verbose;
-                        args[i].out = &keylist->keys[i];
-                        queue->info[i].Function = CrackRepeatingXor_WithKeyLength_Thread;
-                        queue->info[i].arg = &args[i];
-                    }
-                    thrd_t bg_thread = ThreadPool_SubmitQueue(pool, queue);
-                    if (ThrdGood(bg_thread)) {
-                        int result;
-                        if ((thrd_join(bg_thread, &result) == thrd_success) && result != -1) {
-                            // Success finally in the mess...
-                            failure = false;
-                            if (verbose) {
-                                CrackRBX_PrintSummary(keylist);
+        struct CrackRbxThreadArgs* args = malloc(num_keys_to_test * sizeof(struct CrackRbxThreadArgs));
+        if (args != NULL) {
+            if (queue != NULL) {
+                keylist = malloc(sizeof(struct RepeatingXorKeys));
+                if (keylist != NULL) {
+                    keylist->keys = calloc(num_keys_to_test, sizeof(keylist->keys));
+                    bool failure = true;
+                    if (keylist->keys != NULL) {
+                        keylist->length = num_keys_to_test;
+                        for (size_t i = 0; i < num_keys_to_test; i++) {
+                            args[i].analyzer = analyzer;
+                            args[i].buf = buf;
+                            args[i].keylength = rank.keysize[i];
+                            args[i].verbose = verbose;
+                            args[i].out = &keylist->keys[i];
+                            queue->info[i].Function = CrackRepeatingXor_WithKeyLength_Thread;
+                            queue->info[i].arg = &args[i];
+                        }
+                        thrd_t bg_thread = ThreadPool_SubmitQueue(pool, queue);
+                        if (ThrdGood(bg_thread)) {
+                            if ((thrd_join(bg_thread, &result) == thrd_success) && result != -1) {
+                                // Success finally in the mess...
+                                failure = false;
+                                if (verbose) {
+                                    CrackRBX_PrintSummary(keylist);
+                                }
                             }
                         }
-                    } else {
-                        fputs("Failed to start crackrbx threads\n", stderr);
+                        else {
+                            fputs("Failed to start crackrbx threads\n", stderr);
+                        }
+                    }
+                    if (failure) {
+                        CrackRBX_FreeKeys(keylist);
+                        keylist = NULL;
+                        fputs("CrackRBX failed\n", stderr);
                     }
                 }
-                if (failure) {
-                    CrackRBX_FreeKeys(keylist);
-                    keylist = NULL;
-                    fputs("CrackRBX failed\n", stderr);
+                else {
+                    perror("CrackSBX");
                 }
-            } else {
-                perror("CrackSBX");
+                ThreadQueue_Free(queue);
             }
-            ThreadQueue_Free(queue);
+            free(args);
         }
         ThreadPool_Free(pool);
     }
@@ -105,47 +109,54 @@ int CrackRBX_RankKeySizes(struct RankedKeySize* out, size_t keymin, size_t keyma
     }
     // allocate a score array big enough to hold all the rankings
     size_t num_keys = (keymax - keymin) + 1;
-    float scores[num_keys];
-    for (size_t keysize = keymin; keysize <= keymax; keysize++) {
-        // For each KEYSIZE, take the first KEYSIZE worth of bytes,
-        // and the second KEYSIZE worth of bytes, and find the edit distance between them.
-        // Normalize this result by dividing by KEYSIZE.
-        // The KEYSIZE with the smallest normalized edit distance is probably the key.
-        size_t num_chunks = buf->length / keysize;
-        if (num_chunks == 1) {
-            scores[keysize - keymin] = 1000;
-            continue;
+    float* scores = malloc(num_keys * sizeof(float));
+    if (scores != NULL) {
+        for (size_t keysize = keymin; keysize <= keymax; keysize++) {
+            // For each KEYSIZE, take the first KEYSIZE worth of bytes,
+            // and the second KEYSIZE worth of bytes, and find the edit distance between them.
+            // Normalize this result by dividing by KEYSIZE.
+            // The KEYSIZE with the smallest normalized edit distance is probably the key.
+            size_t num_chunks = buf->length / keysize;
+            if (num_chunks == 1) {
+                scores[keysize - keymin] = 1000;
+                continue;
+            }
+            size_t total_hamming_distance = 0;
+            for (size_t i = 0; i < (num_chunks - 1); i++) {
+                struct Buffer left_chunk = {
+                    .data = (uint8_t*)&buf->data[i * keysize],
+                    .length = keysize
+                };
+                struct Buffer right_chunk = {
+                    .data = (uint8_t*)&buf->data[(i + 1) * keysize],
+                    .length = keysize
+                };
+                size_t result = GetHammingDistance(&left_chunk, &right_chunk);
+                if (result == SIZE_MAX) {
+                    free(scores);
+                    return EXIT_FAILURE;
+                }
+                total_hamming_distance += result;
+            }
+            float average_hamming_distance = ((float)total_hamming_distance) / (num_chunks - 1);
+            float normalized_rank = average_hamming_distance / keysize;
+            scores[keysize - keymin] = normalized_rank;
         }
-        size_t total_hamming_distance = 0;
-        for (size_t i = 0; i < (num_chunks - 1); i++) {
-            struct Buffer left_chunk = {
-                .data = (uint8_t*) &buf->data[i * keysize],
-                .length = keysize
-            };
-            struct Buffer right_chunk = {
-                .data = (uint8_t*) &buf->data[(i+1) * keysize],
-                .length = keysize
-            };
-            size_t result = GetHammingDistance(&left_chunk, &right_chunk);
-            if (result == SIZE_MAX) {
+
+        size_t* ranking = malloc(num_keys * sizeof(size_t));
+        if (ranking != NULL) {
+            if (RankFloat(ranking, num_keys, scores, num_keys) == EXIT_FAILURE) {
                 return EXIT_FAILURE;
             }
-            total_hamming_distance += result;
+
+            size_t min = num_keys < NUM_KEYS_TO_TEST ? num_keys : NUM_KEYS_TO_TEST;
+            for (size_t i = 0; i < min; i++) {
+                out->keysize[i] = ranking[keymax - keymin - i] + keymin;
+            }
+            free(ranking);
         }
-        float average_hamming_distance = ((float) total_hamming_distance) / (num_chunks - 1);
-        float normalized_rank = average_hamming_distance / keysize;
-        scores[keysize - keymin] = normalized_rank;
-    }
-
-    size_t ranking[num_keys];
-    if (RankFloat(ranking, num_keys, scores, num_keys) == EXIT_FAILURE) {
-        return EXIT_FAILURE;
-    }
-
-    size_t min = num_keys < NUM_KEYS_TO_TEST ? num_keys : NUM_KEYS_TO_TEST;
-    for (size_t i = 0; i < min; i++) {
-        out->keysize[i] = ranking[keymax - keymin - i] + keymin;
-    }
+        free(scores);
+    }    
     return EXIT_SUCCESS;
 }
 
@@ -207,17 +218,17 @@ struct Buffer* CrackRepeatingXor_WithKeyLength(size_t keylength, const struct Bu
         char null_terminator = '\0';
         fwrite(&null_terminator, 1, 1, verbose_fp);
         long size = ftell(verbose_fp);
-        char* buf = malloc((size_t) size);
-        if (buf != NULL) {
+        char* textbuf = malloc((size_t) size);
+        if (textbuf != NULL) {
             rewind(verbose_fp);
-            int bytes = fread(buf, 1, size, verbose_fp);
+            size_t bytes = fread(textbuf, 1, size, verbose_fp);
             if (bytes > 0) {
-                Thread_printf("%s\n", buf);
+                Thread_printf("%s\n", textbuf);
                 fclose(verbose_fp);
             } else {
                 fputs("Error streaming log buffer to stdout\n", stderr);
             }
-            free(buf);
+            free(textbuf);
         } else {
             fputs("Couldn't allocate memory, logs are gone\n", stderr);
         }

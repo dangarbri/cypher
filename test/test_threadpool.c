@@ -31,7 +31,7 @@ void test_Pool() {
     // Submit the queue to the pool
     // Since it's 5 threads and 5 tasks, they should all complete in around 1 second.
     thrd_t primary_thread = ThreadPool_SubmitQueue(pool, queue);
-    assert(primary_thread != 0);
+    assert(ThrdGood(primary_thread));
     time_t start = time(NULL);
     // Wait for the pool to finish processing the queue
     int status = thrd_join(primary_thread, NULL);
@@ -56,7 +56,7 @@ void test_FullQueue() {
     // Submit the queue to the pool
     // Since it's 2 threads and 4 tasks, it should take roughly double the time to complete
     thrd_t primary_thread = ThreadPool_SubmitQueue(pool, queue);
-    assert(primary_thread != 0);
+    assert(ThrdGood(primary_thread));
     time_t start = time(NULL);
     // Wait for the pool to finish processing the queue
     int status = thrd_join(primary_thread, NULL);

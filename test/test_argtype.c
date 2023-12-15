@@ -36,8 +36,8 @@ void test_Argtype_Parse_File() {
     char fname[] = "file:test_data/cypher";
     struct Buffer* arg = Argtype_New(fname);
     assert(arg != NULL);
-    assert(arg->length == 14);
-    assert(strncmp("Hello, cypher\n", (char*) arg->data, 14) == 0);
+    assert(arg->length == 46);
+    assert(strncmp("Hello, cypher! This spans is 3 128-bit blocks\n", (char*) arg->data, 14) == 0);
     Argtype_Free(arg);
 }
 

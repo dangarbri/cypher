@@ -6,7 +6,7 @@
 #define SUCCESS 0
 #define FAILURE 1
 
-int Pad_PKCS7(struct Buffer* buf, size_t blocksize) {
+int PKCS7_Pad(struct Buffer* buf, size_t blocksize) {
     // return failure if buffer or blocksize are invalid
     if (!Buffer_IsValid(buf) || (blocksize == 0)) { return FAILURE; }
     // If the buffer is already aligned, return success
@@ -34,10 +34,21 @@ int Pad_PKCS7(struct Buffer* buf, size_t blocksize) {
     }
 }
 
-int Pad(struct Buffer* buf, size_t blocksize, PadAlgorithm algo) {
-    if (algo == NULL) {
-        return Pad_PKCS7(buf, blocksize);
-    } else {
-        return algo(buf, blocksize);
+int PKCS7_Unpad(struct Buffer* buf) {
+    if (!Buffer_IsValid(buf)) { return FAILURE; }
+    uint8_t padsize = buf->data[buf->length - 1];
+    if (padsize == 0) { return FAILURE; }
+
+    // Validate padding
+    uint8_t* end = &buf->data[buf->length - padsize];
+    while (end < &buf->data[buf->length]) {
+        if (*end != padsize) {
+            return FAILURE;
+        }
+        end += 1;
     }
+
+    buf->length -= padsize;
+    buf->data[buf->length] = '\0';
+    return SUCCESS;
 }

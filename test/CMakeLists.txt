@@ -4,7 +4,7 @@ file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/../test/test_data
 
 add_definitions(-DNDEBUG=0)
 include_directories(../src)
-link_libraries(${Openssl_LIBRARIES})
+link_libraries(OpenSSL::applink)
 # Test Section
 add_executable(test_subcommand
   test_subcommand.c

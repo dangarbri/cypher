@@ -1,4 +1,3 @@
-include_directories(.)
 add_executable(cypher
   main.c
   analyzers/ecb.c
@@ -26,5 +25,5 @@ add_executable(cypher
 )
 install(TARGETS cypher)
 target_link_libraries(cypher
-  LINK_PRIVATE ${Openssl_LIBRARIES}
+  PRIVATE OpenSSL::applink
 )

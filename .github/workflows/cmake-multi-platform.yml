@@ -53,23 +53,12 @@ jobs:
       id: cache-openssl
       uses: actions/cache@v3
       with:
-        path: openssl
+        path: openssl-3.2.0
         key: ${{ runner.os }}-openssl
 
-    - name: Download openssl on windows
-      if: (steps.cache-openssl.outputs.cache-hit != 'true') && (matrix.os == 'windows-latest')
-      run: |
-        mkdir -f openssl
-        cd openssl
-        curl -X GET "https://slproweb.com/download/Win64OpenSSL-3_2_0.msi" --output openssl.msi
-
-    - name: Install openssl on windows
+    - name: Build and install openssl
       if: matrix.os == 'windows-latest'
-      run: cd openssl && msiexec /qn /i openssl.msi
-      
-    - name: Debug print
-      run: |
-        dir "C:/Program Files/OpenSSL/include"
+      run: .github\workflows\windows\setup.bat
 
     - name: Set reusable strings
       # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.

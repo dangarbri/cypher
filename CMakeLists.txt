@@ -17,6 +17,7 @@ else()
   add_compile_options(-Wall -Wextra -Wpedantic -Werror)
   set(Openssl_LIBRARIES ssl crypto)
 endif()
+find_package(OpenSSL REQUIRED)
 
 add_subdirectory(src)
 add_subdirectory(test)

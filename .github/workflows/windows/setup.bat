@@ -15,7 +15,7 @@ cd openssl-%OPENSSL_VERSION%
 nmake install || goto BUILD
 exit /b 0
 
-BUILD:
+:BUILD
 perl Configure VC-WIN64A
 set CL=/MP
 nmake

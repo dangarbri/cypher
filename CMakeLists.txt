@@ -16,6 +16,9 @@ endif()
 find_package(OpenSSL REQUIRED)
 include_directories(OPENSSL_INCLUDE_DIR)
 
+include(CMakePrintHelpers)
+cmake_print_variables(OPENSSL_INCLUDE_DIR)
+
 
 add_subdirectory(src)
 add_subdirectory(test)

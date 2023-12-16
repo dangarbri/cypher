@@ -48,11 +48,28 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Install openssl on windows
-      if: ${{ matrix.os }} == "windows-latest"
+    - name: Cache openssl
+      if: ${{ runner.os }} == "windows-latest"
+      id: cache-openssl
+      uses: actions/cache@v3
+      with:
+        path: openssl
+        key: ${{ runner.os }}-openssl
+
+    - name: Download openssl on windows
+      if: (steps.cache-primes.outputs.cache-hit != 'true') && (${{ runner.os }} == "windows-latest")
       run: |
+        mkdir cd openssl
         curl -X GET "https://slproweb.com/download/Win64OpenSSL-3_2_0.msi" --output openssl.msi
-        msiexec /qn /i openssl.msi
+
+    - name: Install openssl on windows
+      if: ${{ runner.os }} == "windows-latest"
+      run: cd openssl && msiexec /qn /i openssl.msi
+      
+    - name: Debug print
+      run: |
+        echo "Hi, this is ${{ runner.os }}"
+        echo "Or maybe its ${{ matrix.os }}"
 
     - name: Set reusable strings
       # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.

@@ -1,9 +1,6 @@
-include(CMakePrintHelpers)
-message("This is in the src dir")
-cmake_print_variables(OPENSSL_INCLUDE_DIR)
 include_directories(
 	.
-	OPENSSL_INCLUDE_DIR
+	${OPENSSL_INCLUDE_DIR}
 )
 add_executable(cypher
   main.c

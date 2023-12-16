@@ -2,7 +2,9 @@
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/../test/test_data
      DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-add_definitions(-DNDEBUG=0)
+include(CMakePrintHelpers)
+message("This is in the test dir")
+cmake_print_variables(OPENSSL_INCLUDE_DIR)
 include_directories(
     ../src
     OPENSSL_INCLUDE_DIR

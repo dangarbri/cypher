@@ -12,11 +12,11 @@ tar xf perl.zip
 tar xf nasm.zip
 
 cd openssl-%OPENSSL_VERSION%
-nmake install
+nmake install || goto BUILD
+exit /b 0
 
-if %errorlevel%!=0 (
+BUILD:
 perl Configure VC-WIN64A
 set CL=/MP
 nmake
 nmake install
-)

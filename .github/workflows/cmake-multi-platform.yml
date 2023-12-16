@@ -59,7 +59,7 @@ jobs:
     - name: Download openssl on windows
       if: (steps.cache-primes.outputs.cache-hit != 'true') && (${{ runner.os }} == "windows-latest")
       run: |
-        mkdir cd openssl
+        cd openssl
         curl -X GET "https://slproweb.com/download/Win64OpenSSL-3_2_0.msi" --output openssl.msi
 
     - name: Install openssl on windows

@@ -120,10 +120,12 @@ add_executable(test_cracksbx
   threading/pool.c
   types/buffer.c
 )
+if(!MSVC)
 add_executable(test_threadpool
   ../test/test_threadpool.c
   threading/pool.c
 )
+endif()
 add_executable(test_hamming
   ../test/test_hamming.c
   operations/hamming.c
@@ -182,10 +184,10 @@ add_test(NAME Rank COMMAND test_rank)
 add_test(NAME Hamming COMMAND test_hamming)
 add_test(NAME AES COMMAND test_aes)
 add_test(NAME Pad COMMAND test_pad)
+if(!MSVC)
+# Windows is still working on their threads.h
 add_test(NAME ThreadPool COMMAND test_threadpool)
+endif()
 
-# Eventually will need to add openssl to this.
-# target_link_libraries()
-
-# Make sure we are using C17
-set_property(TARGET cypher PROPERTY C_STANDARD 17)
+# Make sure we are using C11
+set_property(TARGET cypher PROPERTY C_STANDARD 11)

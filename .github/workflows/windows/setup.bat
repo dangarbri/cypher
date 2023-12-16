@@ -11,10 +11,6 @@ tar xf openssl-%OPENSSL_VERSION%.tar.gz
 tar xf perl.zip
 tar xf nasm.zip
 
-dir "C:\Program Files"
-dir "C:\Program Files\Microsoft Visual Studio"
-"C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x86_amd64
-
 cd openssl-%OPENSSL_VERSION%
 nmake install
 

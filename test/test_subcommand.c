@@ -1,3 +1,4 @@
+#undef NDEBUG
 #include <assert.h>
 #include <string.h>
 #include "../src/cli/subcommand.h"

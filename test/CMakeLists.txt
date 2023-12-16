@@ -4,7 +4,7 @@ file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/../test/test_data
 
 add_definitions(-DNDEBUG=0)
 include_directories(../src)
-link_libraries(${Openssl_LIBRARIES})
+link_libraries(${OPENSSL_LIBRARIES})
 # Test Section
 add_executable(test_subcommand
   test_subcommand.c
@@ -50,7 +50,7 @@ add_executable(test_cracksbx
   ../src/threading/pool.c
   ../src/types/buffer.c
 )
-if(!MSVC)
+if(NOT MSVC)
 add_executable(test_threadpool
   test_threadpool.c
   ../src/threading/pool.c
@@ -88,9 +88,6 @@ add_executable(test_aes
   ../src/operations/xor.c
   ../src/types/buffer.c
 )
-# target_link_libraries(test_aes
-#   LINK_PRIVATE ${Openssl_LIBRARIES}
-# )
 add_executable(test_pad
   test_pad.c
   ../src/operations/pad.c
@@ -122,7 +119,7 @@ add_test(NAME Rank COMMAND test_rank)
 add_test(NAME Hamming COMMAND test_hamming)
 add_test(NAME AES COMMAND test_aes)
 add_test(NAME Pad COMMAND test_pad)
-if(!MSVC)
+if(NOT MSVC)
 # Windows is still working on their threads.h
 add_test(NAME ThreadPool COMMAND test_threadpool)
 endif()

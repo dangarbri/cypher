@@ -1,3 +1,4 @@
+include_directories(.)
 add_executable(cypher
   main.c
   analyzers/ecb.c

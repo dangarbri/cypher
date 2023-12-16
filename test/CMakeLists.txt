@@ -6,7 +6,7 @@ include_directories(
     ../src
     ${OPENSSL_INCLUDE_DIR}
 )
-link_libraries(OpenSSL::applink)
+link_libraries(${OPENSSL_LIBRARIES})
 # Test Section
 add_executable(test_subcommand
   test_subcommand.c

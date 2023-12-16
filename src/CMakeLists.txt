@@ -29,5 +29,5 @@ add_executable(cypher
 )
 install(TARGETS cypher)
 target_link_libraries(cypher
-  PRIVATE OpenSSL::applink
+  PRIVATE ${OPENSSL_LIBRARIES}
 )

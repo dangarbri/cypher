@@ -50,7 +50,7 @@ jobs:
     - name: Install openssl on windows
       if: ${{ matrix.os }} == "windows-latest"
       run: |
-        curl -X GET "https://slproweb.com/download/Win64OpenSSL_Light-3_2_0.msi" --output openssl.msi
+        curl -X GET "https://slproweb.com/download/Win64OpenSSL-3_2_0.msi" --output openssl.msi
         msiexec /qn /i openssl.msi
 
     - name: Set reusable strings

@@ -129,7 +129,7 @@ struct Buffer* Aes128Cbc_Encrypt(struct Buffer* key, struct Buffer* iv, struct B
     return encrypted;
 }
 
-struct Buffer* Aes128Cbc_Decrypt(struct Buffer* key, struct Buffer* iv, struct Buffer* data) {
+struct Buffer* _Aes128Cbc_Decrypt(struct Buffer* key, struct Buffer* iv, struct Buffer* data, bool ignore_padding) {
     const uint8_t blocksize = 16;
     if (!Buffer_IsValid(key) || !Buffer_IsValid(iv) ||
         !Buffer_IsValid(data) || (key->length != blocksize)
@@ -178,15 +178,22 @@ struct Buffer* Aes128Cbc_Decrypt(struct Buffer* key, struct Buffer* iv, struct B
         Buffer_Free(decrypted);
         decrypted = NULL;
     } else {
-        if ((decrypted->length % blocksize) != 0) {
-            if (PKCS7_Unpad(decrypted) != 1) {
-                fputs("Invalid padding\n", stderr);
-                Buffer_Free(decrypted);
-                decrypted = NULL;
-            }
+        if (!ignore_padding && (PKCS7_Unpad(decrypted) != 1)) {
+            fputs("Invalid padding\n", stderr);
+            Buffer_Free(decrypted);
+            decrypted = NULL;
         }
     }
 
     return decrypted;
 }
 
+struct Buffer* Aes128Cbc_Decrypt(struct Buffer* key, struct Buffer* iv, struct Buffer* data) {
+    // First try to decrypt with padding
+    struct Buffer* plaintext = _Aes128Cbc_Decrypt(key, iv, data, false);
+    if (plaintext == NULL) {
+        // If that fails, try decrypt without padding
+        plaintext = _Aes128Cbc_Decrypt(key, iv, data, true);
+    }
+    return plaintext;
+}

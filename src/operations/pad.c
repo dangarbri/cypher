@@ -9,8 +9,6 @@
 int PKCS7_Pad(struct Buffer* buf, size_t blocksize) {
     // return failure if buffer or blocksize are invalid
     if (!Buffer_IsValid(buf) || (blocksize == 0)) { return FAILURE; }
-    // If the buffer is already aligned, return success
-    if ((buf->length % blocksize) == 0) { return SUCCESS; }
 
     // length % blocksize will give how many bytes are in the last "block"
     // blocksize - this value will return how many bytes need to be added on.

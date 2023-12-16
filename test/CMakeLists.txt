@@ -3,7 +3,10 @@ file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/../test/test_data
      DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 add_definitions(-DNDEBUG=0)
-include_directories(../src)
+include_directories(
+    ../src
+    OPENSSL_INCLUDE_DIR
+)
 link_libraries(OpenSSL::applink)
 # Test Section
 add_executable(test_subcommand

@@ -1,4 +1,7 @@
-include_directories(.)
+include_directories(
+	.
+	OPENSSL_INCLUDE_DIR
+)
 add_executable(cypher
   main.c
   analyzers/ecb.c

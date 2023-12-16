@@ -14,7 +14,6 @@ else()
   add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 endif()
 find_package(OpenSSL REQUIRED)
-include_directories(OPENSSL_INCLUDE_DIR)
 
 include(CMakePrintHelpers)
 cmake_print_variables(OPENSSL_INCLUDE_DIR)

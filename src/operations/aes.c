@@ -121,6 +121,10 @@ struct Buffer* Aes128Cbc_Encrypt(struct Buffer* key, struct Buffer* iv, struct B
         Buffer_Free(xor_block);
     }
 
+    if (!PKCS7_Unpad(data)) {
+        failure = true;
+    }
+
     if (failure) {
         Buffer_Free(encrypted);
         encrypted = NULL;

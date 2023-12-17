@@ -24,6 +24,17 @@ struct Buffer* Buffer_New(size_t size) {
     return buf;
 }
 
+struct Buffer* Buffer_Wrap(uint8_t* ptr, size_t length) {
+    struct Buffer* buf = malloc(sizeof(struct Buffer));
+    if (buf) {
+        buf->data = ptr;
+        buf->length = length;
+    } else {
+        perror("Buffer_Wrap");
+    }
+    return buf;
+}
+
 void Buffer_Free(struct Buffer* buffer) {
     if (buffer != NULL) {
         if (buffer->data != NULL) {

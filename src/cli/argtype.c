@@ -178,13 +178,13 @@ struct Buffer* Argtype_Program(char* cmd) {
     return buffer;
 }
 
-struct Buffer* Argtype_StreamB64(FILE* stream) {
+struct Buffer* Argtype_StreamDecode(FILE* stream, struct Buffer* (*decoder)(char*)) {
     struct Buffer* result = NULL;
     // Process the stream
     struct Buffer* stream_contents = Argtype_Stream(stream);
     if (stream_contents) {
         // Decode the stream's contents
-        struct Buffer* decoded = Argtype_Base64((char*) stream_contents->data);
+        struct Buffer* decoded = decoder((char*) stream_contents->data);
         // If all is good, assign that to the output
         if (decoded) {
             result = decoded;
@@ -194,12 +194,22 @@ struct Buffer* Argtype_StreamB64(FILE* stream) {
     return result;
 }
 
+struct Buffer* Argtype_StreamB64(FILE* stream) {
+    return Argtype_StreamDecode(stream, Argtype_Base64);
+}
+
+struct Buffer* Argtype_StreamHex(FILE* stream) {
+    return Argtype_StreamDecode(stream, Argtype_Hex);
+}
+
 struct Buffer* Argtype_New(char* arg) {
     // stdin arguments
     if ((strlen(arg) == 1) && (strcmp(arg, "-") == 0)) {
         return Argtype_Stream(stdin);
     } else if (strcmp(arg, "base64:-") == 0) {
         return Argtype_StreamB64(stdin);
+    } else if (strcmp(arg, "hex:-") == 0) {
+        return Argtype_StreamHex(stdin);
     }
 
     char* delim = ":";

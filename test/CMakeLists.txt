@@ -30,6 +30,10 @@ add_executable(test_argtype_stdin_b64
   test_argtype_stdin_b64.c
   ${ARGTYPE_SOURCES}
 )
+add_executable(test_argtype_stdin_hex
+  test_argtype_stdin_hex.c
+  ${ARGTYPE_SOURCES}
+)
 add_executable(test_base64
   test_base64.c
   ../src/parsers/base64.c
@@ -122,9 +126,14 @@ add_test(NAME Subcommands COMMAND test_subcommand)
 add_test(NAME Parsers COMMAND test_parsers)
 add_test(NAME Base64 COMMAND test_base64)
 add_test(NAME Argtype COMMAND test_argtype)
-add_test(NAME Argtype_stdin COMMAND echo -n "hello" | test_argtype_stdin)
-add_test(NAME Argtype_stdin_b64 COMMAND echo -n "aGVsbG8=" | test_argtype_stdin_b64)
-add_test(NAME Argtype_stdin_b64_newline COMMAND echo "aGVsbG8=" | test_argtype_stdin_b64)
+if(NOT MSVC)
+add_test(NAME Argtype_stdin COMMAND bash -c "echo -n 'hello' | ./test_argtype_stdin")
+add_test(NAME Argtype_stdin_b64 COMMAND bash -c "echo -n \"aGVsbG8=\" | ./test_argtype_stdin_b64")
+add_test(NAME Argtype_stdin_b64_newline COMMAND bash -c "echo \"aGVsbG8=\" | ./test_argtype_stdin_b64")
+add_test(NAME Argtype_stdin_hex COMMAND bash -c "echo -n \"68656c6c6f\" | ./test_argtype_stdin_hex")
+else()
+# TODO: How to run these on windows?
+endif()
 add_test(NAME xor COMMAND test_xor)
 add_test(NAME sbxor COMMAND test_sbxor)
 add_test(NAME buffer COMMAND test_buffer)

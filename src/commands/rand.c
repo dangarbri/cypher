@@ -45,8 +45,11 @@ int RandCli(int argc, char* argv[]) {
     errno = 0;
     unsigned long long count = strtoull(count_str, &invalid, 10);
     if (errno) {
-        fputs("Invalid characters found at %s: ", stderr);
         perror(NULL);
+        return EXIT_FAILURE;
+    }
+    if (invalid) {
+        fprintf(stderr, "Invalid input '%s'\n", invalid);
         return EXIT_FAILURE;
     }
 

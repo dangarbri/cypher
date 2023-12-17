@@ -1,5 +1,6 @@
 #undef NDEBUG
 #include <assert.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -42,10 +43,19 @@ void test_Argtype_Parse_File() {
     Argtype_Free(arg);
 }
 
+void test_Argtype_Program() {
+    char cmd[] = "prog:ls -l";
+    struct Buffer* data = Argtype_New(cmd);
+    assert(data != NULL);
+    printf("%s", data->data);
+    Buffer_Free(data);
+}
+
 int main() {
     test_Argtype_Parse();
     test_Argtype_Parse_Hex();
     test_Argtype_Parse_Base64();
     test_Argtype_Parse_File();
+    test_Argtype_Program();
     return 0;
 }

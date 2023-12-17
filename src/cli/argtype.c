@@ -6,6 +6,11 @@
 #include "parsers/hex.h"
 #include "parsers/base64.h"
 
+#ifdef _MSC_VER
+#define popen _popen
+#define pclose _pclose
+#endif
+
 /**
  * Parses hex data into a binary arg
  */
@@ -123,6 +128,52 @@ struct Buffer* Argtype_String(char* arg) {
     return NULL;
 }
 
+/**
+ * Runs the given command string and uses the command's output as the argument
+ */
+struct Buffer* Argtype_Program(char* cmd) {
+    FILE* pipe = popen(cmd, "r");
+    struct Buffer* buffer = NULL;
+    if (pipe) {
+        size_t blocksize = 1024;
+        size_t bufsize = blocksize;
+        size_t remaining_space = bufsize;
+        size_t bytes_read = 0;
+        buffer = Buffer_New(bufsize);
+        if (buffer) {
+            bool success = true;
+            while(!feof(pipe)) {
+                // Read up to enough bytes to fill the buffer
+                bytes_read += fread(buffer->data + bytes_read, 1, remaining_space, pipe);
+                remaining_space = bufsize - bytes_read;
+                if (remaining_space == 0) {
+                    size_t extended_size = bufsize + blocksize;
+                    // check for overflow
+                    if (extended_size < bufsize) {
+                        fputs("Read limit exceeded\n", stderr);
+                        success = false;
+                        break;
+                    }
+                    bufsize = extended_size;
+                    // Need to increase buffer size
+                    if (!Buffer_Resize(buffer, bufsize)) {
+                        fputs("Unable to increase buffer size\n", stderr);
+                        success = false;
+                        break;
+                    }
+                }
+            }
+            if (!success) {
+                Buffer_Free(buffer);
+                buffer = NULL;
+            }
+        }
+        pclose(pipe);
+    }
+
+    return buffer;
+}
+
 struct Buffer* Argtype_New(char* arg) {
     char* delim = ":";
     char* type = strtok(arg, delim);
@@ -141,6 +192,9 @@ struct Buffer* Argtype_New(char* arg) {
     } else if (strncmp("file", type, 4) == 0) {
         char* fname = strtok(NULL, delim);
         return Argtype_File(fname);
+    } else if (strncmp("prog", type, 4) == 0) {
+        char* command = strtok(NULL, delim);
+        return Argtype_Program(command);
     } else {
         return Argtype_String(arg);
     }

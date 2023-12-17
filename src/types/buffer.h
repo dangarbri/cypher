@@ -23,6 +23,11 @@ struct Buffer {
 struct Buffer* Buffer_New(size_t size);
 
 /**
+ * Wraps a ptr with the buffer struct.
+ */
+struct Buffer* Buffer_Wrap(uint8_t* ptr, size_t length);
+
+/**
  * Allocates a new buffer and copies the contents of buf into it.
  * @param buf buffer to clone
  * @returns new buffer or NULL

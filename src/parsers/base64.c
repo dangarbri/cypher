@@ -11,7 +11,7 @@
  * Calling BIO_free will free the bio without freeing the data.
  * @param bio BIO to claim data for
  * @param out Data pointer will be written here. You are responsible for freeing this.
- * @return length of the data buffer
+ * @return length of the data buffer or a value < 0 on error
  */
 long BIO_claim_data(BIO* bio, uint8_t** out) {
     BUF_MEM* bptr;
@@ -25,12 +25,8 @@ long BIO_claim_data(BIO* bio, uint8_t** out) {
     return length;
 }
 
-struct Base64Data Base64_Encode(uint8_t* data, size_t length) {
-    struct Base64Data result = {
-        .data = NULL,
-        .length = 0,
-        .valid = false
-    };
+struct Buffer* Base64_Encode(uint8_t* data, size_t length) {
+    struct Buffer* result = NULL;
     // Create a BIO for storing encoded data
     BIO* encoded = BIO_new(BIO_s_mem());
     if (encoded != NULL) {
@@ -43,20 +39,20 @@ struct Base64Data Base64_Encode(uint8_t* data, size_t length) {
             if (BIO_write(b64, data, (int) length) >= 0) {
                 BIO_flush(b64);
                 // Extract encoded data from the encoded bio
-                result.length = BIO_claim_data(encoded, &result.data);
-                // The result is not null terminated, so let's fix that
-                // Allocate another buffer that is 1 byte larger than the length for space for the null byte.
-                uint8_t* new_ptr = realloc(result.data, result.length + 1);
-                if (new_ptr != NULL) {
-                    result.data = new_ptr;
-                    result.data[result.length] = '\0';
-                    result.valid = true;
-                } else {
-                    perror("Base64_Encode: ");
-                    // Free the original buffer, clear the data and return with valid = false
-                    free(result.data);
-                    result.data = NULL;
-                    result.length = 0;
+                uint8_t* bio_data;
+                long length = BIO_claim_data(encoded, &bio_data);
+                if (length > 0) {
+                    // The result is not null terminated, so let's fix that
+                    // Allocate another buffer that is 1 byte larger than the length for space for the null byte.
+                    bio_data = realloc(bio_data, ((size_t)length) + 1);
+                    if (bio_data) {
+                        result = Buffer_Wrap(bio_data, ((size_t) length));
+                        if (result) {
+                            result->data[length] = '\0';
+                        }
+                    } else {
+                        perror("Base64_Encode");
+                    }
                 }
                 BIO_free(b64);
             } else {
@@ -72,12 +68,8 @@ struct Base64Data Base64_Encode(uint8_t* data, size_t length) {
     return result;
 }
 
-struct Base64Data Base64_Decode(char* data) {
-    struct Base64Data result = {
-        .data = NULL,
-        .length = 0,
-        .valid = false
-    };
+struct Buffer* Base64_Decode(char* data) {
+    struct Buffer* result = NULL;
     bool no_newlines = strchr((char*) data, '\n') == NULL;
     size_t length = strlen(data);
     // Create a BIO around the base64 encoded data
@@ -99,14 +91,7 @@ struct Base64Data Base64_Decode(char* data) {
                 if (bytes_returned != 0) {
                     // Resize final buffer to size of data returned
                     uint8_t* right_size_ptr = realloc(decoded, bytes_returned);
-                    if (right_size_ptr != NULL) {
-                        result.data = right_size_ptr;
-                        result.length = bytes_returned;
-                        result.valid = true;
-                    } else {
-                        free(decoded);
-                        fputs("Not enough memory for base64 decoded data\n", stderr);
-                    }
+                    result = Buffer_Wrap(right_size_ptr, bytes_returned);
                 }
             } else {
                 fputs("Failed to allocate memory for base64 decoded data\n", stderr);

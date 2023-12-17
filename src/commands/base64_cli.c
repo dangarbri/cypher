@@ -53,14 +53,14 @@ int b64_encode(int argc, char** argv) {
     if (arg == NULL) {
         return EXIT_FAILURE;
     }
-    struct Base64Data data = Base64_Encode((uint8_t*) arg->data, arg->length);
+    struct Buffer* data = Base64_Encode((uint8_t*) arg->data, arg->length);
     Argtype_Free(arg);
-    if (!data.valid) {
+    if (data == NULL) {
         fputs("Sorry, I couldn't encode that!\n", stderr);
         return EXIT_FAILURE;
     }
-    printf("%s\n", data.data);
-    free(data.data);
+    printf("%s\n", data->data);
+    Buffer_Free(data);
     return 0;
 }
 
@@ -73,14 +73,14 @@ int b64_decode(int argc, char** argv) {
     if (arg == NULL) {
         return EXIT_FAILURE;
     }
-    struct Base64Data data = Base64_Decode((char*) arg->data);
+    struct Buffer* data = Base64_Decode((char*) arg->data);
     Argtype_Free(arg);
-    if (!data.valid) {
+    if (data == NULL) {
         fputs("Sorry, I couldn't decode that!\n", stderr);
         return EXIT_FAILURE;
     }
-    printf("%s\n", data.data);
-    free(data.data);
+    printf("%s\n", data->data);
+    Buffer_Free(data);
     return 0;
 }
 

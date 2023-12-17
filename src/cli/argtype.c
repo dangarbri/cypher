@@ -128,6 +128,43 @@ struct Buffer* Argtype_String(char* arg) {
     return NULL;
 }
 
+struct Buffer* Argtype_Stream(FILE* stream) {
+    size_t blocksize = 1024;
+    size_t bufsize = blocksize;
+    size_t remaining_space = bufsize;
+    size_t bytes_read = 0;
+    struct Buffer* buffer = Buffer_New(bufsize);
+    if (buffer) {
+        bool success = true;
+        while(!feof(stream)) {
+            // Read up to enough bytes to fill the buffer
+            bytes_read += fread(buffer->data + bytes_read, 1, remaining_space, stream);
+            remaining_space = bufsize - bytes_read;
+            if (remaining_space == 0) {
+                size_t extended_size = bufsize + blocksize;
+                // check for overflow
+                if (extended_size < bufsize) {
+                    fputs("Read limit exceeded\n", stderr);
+                    success = false;
+                    break;
+                }
+                bufsize = extended_size;
+                // Need to increase buffer size
+                if (!Buffer_Resize(buffer, bufsize)) {
+                    fputs("Unable to increase buffer size\n", stderr);
+                    success = false;
+                    break;
+                }
+            }
+        }
+        if (!success) {
+            Buffer_Free(buffer);
+            buffer = NULL;
+        }
+    }
+    return buffer;
+}
+
 /**
  * Runs the given command string and uses the command's output as the argument
  */
@@ -135,46 +172,36 @@ struct Buffer* Argtype_Program(char* cmd) {
     FILE* pipe = popen(cmd, "r");
     struct Buffer* buffer = NULL;
     if (pipe) {
-        size_t blocksize = 1024;
-        size_t bufsize = blocksize;
-        size_t remaining_space = bufsize;
-        size_t bytes_read = 0;
-        buffer = Buffer_New(bufsize);
-        if (buffer) {
-            bool success = true;
-            while(!feof(pipe)) {
-                // Read up to enough bytes to fill the buffer
-                bytes_read += fread(buffer->data + bytes_read, 1, remaining_space, pipe);
-                remaining_space = bufsize - bytes_read;
-                if (remaining_space == 0) {
-                    size_t extended_size = bufsize + blocksize;
-                    // check for overflow
-                    if (extended_size < bufsize) {
-                        fputs("Read limit exceeded\n", stderr);
-                        success = false;
-                        break;
-                    }
-                    bufsize = extended_size;
-                    // Need to increase buffer size
-                    if (!Buffer_Resize(buffer, bufsize)) {
-                        fputs("Unable to increase buffer size\n", stderr);
-                        success = false;
-                        break;
-                    }
-                }
-            }
-            if (!success) {
-                Buffer_Free(buffer);
-                buffer = NULL;
-            }
-        }
+        buffer = Argtype_Stream(pipe);
         pclose(pipe);
     }
-
     return buffer;
 }
 
+struct Buffer* Argtype_StreamB64(FILE* stream) {
+    struct Buffer* result = NULL;
+    // Process the stream
+    struct Buffer* stream_contents = Argtype_Stream(stream);
+    if (stream_contents) {
+        // Decode the stream's contents
+        struct Buffer* decoded = Argtype_Base64((char*) stream_contents->data);
+        // If all is good, assign that to the output
+        if (decoded) {
+            result = decoded;
+        }
+        Buffer_Free(stream_contents);
+    }
+    return result;
+}
+
 struct Buffer* Argtype_New(char* arg) {
+    // stdin arguments
+    if ((strlen(arg) == 1) && (strcmp(arg, "-") == 0)) {
+        return Argtype_Stream(stdin);
+    } else if (strcmp(arg, "base64:-") == 0) {
+        return Argtype_StreamB64(stdin);
+    }
+
     char* delim = ":";
     char* type = strtok(arg, delim);
     if (type == NULL) {

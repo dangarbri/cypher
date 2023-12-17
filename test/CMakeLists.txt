@@ -5,6 +5,14 @@ file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/../test/test_data
 add_definitions(-DNDEBUG=0)
 include_directories(../src)
 link_libraries(${OPENSSL_LIBRARIES})
+
+set(ARGTYPE_SOURCES
+../src/parsers/hex.c
+../src/parsers/base64.c
+../src/cli/argtype.c
+../src/types/buffer.c
+)
+
 # Test Section
 add_executable(test_subcommand
   test_subcommand.c
@@ -12,10 +20,15 @@ add_executable(test_subcommand
 )
 add_executable(test_argtype
   test_argtype.c
-  ../src/parsers/hex.c
-  ../src/parsers/base64.c
-  ../src/cli/argtype.c
-  ../src/types/buffer.c
+  ${ARGTYPE_SOURCES}
+)
+add_executable(test_argtype_stdin
+  test_argtype_stdin.c
+  ${ARGTYPE_SOURCES}
+)
+add_executable(test_argtype_stdin_b64
+  test_argtype_stdin_b64.c
+  ${ARGTYPE_SOURCES}
 )
 add_executable(test_base64
   test_base64.c
@@ -109,6 +122,9 @@ add_test(NAME Subcommands COMMAND test_subcommand)
 add_test(NAME Parsers COMMAND test_parsers)
 add_test(NAME Base64 COMMAND test_base64)
 add_test(NAME Argtype COMMAND test_argtype)
+add_test(NAME Argtype_stdin COMMAND echo -n "hello" | test_argtype_stdin)
+add_test(NAME Argtype_stdin_b64 COMMAND echo -n "aGVsbG8=" | test_argtype_stdin_b64)
+add_test(NAME Argtype_stdin_b64_newline COMMAND echo "aGVsbG8=" | test_argtype_stdin_b64)
 add_test(NAME xor COMMAND test_xor)
 add_test(NAME sbxor COMMAND test_sbxor)
 add_test(NAME buffer COMMAND test_buffer)

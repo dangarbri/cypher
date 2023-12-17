@@ -48,9 +48,15 @@ int RandCli(int argc, char* argv[]) {
         perror(NULL);
         return EXIT_FAILURE;
     }
-    if (invalid) {
+
+    if ((invalid != NULL) && (*invalid != '\0')) {
         fprintf(stderr, "Invalid input '%s'\n", invalid);
         return EXIT_FAILURE;
+    }
+
+    // nothing to do.
+    if (count == 0) {
+        return EXIT_SUCCESS;
     }
 
     if (!hex) {

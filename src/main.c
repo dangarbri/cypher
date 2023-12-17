@@ -4,6 +4,7 @@
 #include "commands/base64_cli.h"
 #include "commands/crack.h"
 #include "commands/decrypt.h"
+#include "commands/rand.h"
 #include "commands/print.h"
 #include "commands/xor_cli.h"
 
@@ -16,6 +17,7 @@ struct Subcommand commands[] = {
     {"crack", "encryption cracking utilities", CrackCli},
     {"decrypt", "Decryption utilities", Decrypt},
     {"print", "Print the input to stdout", PrintInput},
+    {"rand", "Generate random bytes", RandCli},
     {"xor", "xor on cli arguments", XorCmd},
     {NULL}
 };

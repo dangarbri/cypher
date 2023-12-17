@@ -14,6 +14,7 @@ add_executable(cypher
   commands/crack.c
   commands/decrypt.c
   commands/print.c
+  commands/rand.c
   commands/xor_cli.c
   operations/aes.c
   operations/hamming.c

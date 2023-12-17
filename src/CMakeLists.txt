@@ -5,6 +5,7 @@ add_executable(cypher
   analyzers/english.c
   analyzers/sbx.c
   cli/argtype.c
+  cli/flags.c
   cli/subcommand.c
   crackers/cracksbx.c
   crackers/crackrbx.c

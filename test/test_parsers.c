@@ -28,7 +28,7 @@ void test_Hex_Encode() {
     char* result = Hex_Encode(&buf);
     assert(result != NULL);
     assert(strlen(result) == 10);
-    assert(strncmp(result, "48656c6c6f", 10) == 0);
+    assert(strcmp(result, "48656c6c6f") == 0);
     free(result);
 }
 

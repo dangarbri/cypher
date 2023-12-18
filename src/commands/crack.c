@@ -7,15 +7,18 @@
 #include "cli/subcommand.h"
 #include "crackers/cracksbx.h"
 #include "crackers/crackrbx.h"
+#include "crackers/ecb_leak.h"
 #include "operations/xor.h"
 #include "crack.h"
 
 int CrackCli_SingleByteXor(int argc, char* argv[]);
 int CrackCLI_RepeatingXor(int argc, char* argv[]);
+int CrackCLI_EcbLeak(int argc, char* argv[]);
 
 struct Subcommand CrackCommands[] = {
     {"sbx", "Crack single byte xor cipher", CrackCli_SingleByteXor},
     {"rbx", "Crack repeating xor cipher", CrackCLI_RepeatingXor},
+    {"ecbleak", "Tap a program using ecb encryption", CrackCLI_EcbLeak},
     {NULL}
 };
 
@@ -148,6 +151,34 @@ int CrackCLI_RepeatingXor(int argc, char* argv[]) {
         CrackRBX_FreeKeys(keys);
         Argtype_Free(arg);
     } else {
+        return EXIT_FAILURE;
+    }
+    return EXIT_SUCCESS;
+}
+
+int CrackCLI_EcbLeak(int argc, char* argv[]) {
+    if (argc != 2) {
+        puts(
+            "Usage:\n"
+            "  ecbleak [-b] \"command ...FUZZ...\"\n"
+            "\n"
+            "ecbleak attempts to leak data from an application using ecb encryption.\n"
+            "command must be a program or script which returns encrypted data either\n"
+            "as raw binary data, or base64 encoded data\n"
+            "If you're testing a web application, it could be a script which\n"
+            "sends the HTTP request and prints the results to stdout\n"
+            "\n"
+            "A vulnerable application will append some internal data to your user input\n"
+            "and encrypt the data via aes-128-ecb mode encryption. That encrypted data\n"
+            "must be written to stdout.\n"
+            "and ecbleak will read it from there\n"
+            "\n"
+            "Command arguments should contain the word FUZZ, this is the section of args\n"
+            "that ecbleak will modify to try to get the application to leak data."
+            "\n"
+            "Options:\n"
+            "  -b    Command writes binary data"
+        );
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;

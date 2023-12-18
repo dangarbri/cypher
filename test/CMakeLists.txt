@@ -37,6 +37,7 @@ add_executable(test_argtype_stdin_hex
 add_executable(test_base64
   test_base64.c
   ../src/parsers/base64.c
+  ../src/types/buffer.c
 )
 add_executable(test_parsers
   test_parsers.c

@@ -11,7 +11,7 @@
  * Calling BIO_free will free the bio without freeing the data.
  * @param bio BIO to claim data for
  * @param out Data pointer will be written here. You are responsible for freeing this.
- * @return length of the data buffer
+ * @return length of the data buffer or a value < 0 on error
  */
 long BIO_claim_data(BIO* bio, uint8_t** out) {
     BUF_MEM* bptr;
@@ -42,10 +42,17 @@ struct Buffer* Base64_Encode(uint8_t* data, size_t length) {
                 uint8_t* bio_data;
                 long length = BIO_claim_data(encoded, &bio_data);
                 if (length > 0) {
-                    result = Buffer_Wrap(bio_data, ((size_t) length) + 1);
                     // The result is not null terminated, so let's fix that
                     // Allocate another buffer that is 1 byte larger than the length for space for the null byte.
-                    result->data[length] = '\0';
+                    bio_data = realloc(bio_data, ((size_t)length) + 1);
+                    if (bio_data) {
+                        result = Buffer_Wrap(bio_data, ((size_t) length));
+                        if (result) {
+                            result->data[length] = '\0';
+                        }
+                    } else {
+                        perror("Base64_Encode");
+                    }
                 }
                 BIO_free_all(b64);
             } else {

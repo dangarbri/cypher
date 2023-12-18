@@ -25,20 +25,7 @@ struct Buffer* Argtype_Hex(char* hex) {
 }
 
 struct Buffer* Argtype_Base64(char* base64) {
-    struct Base64Data decoded = Base64_Decode(base64);
-    if (decoded.valid) {
-        struct Buffer *arg = malloc(sizeof(struct Buffer));
-        if (arg != NULL) {
-            arg->data = decoded.data;
-            arg->length = decoded.length;
-            return arg;
-        } else {
-            perror("Argtype_Base64: ");
-        }
-    } else {
-        fprintf(stderr, "Unable to parse base64: `%s`\n", base64);
-    }
-    return NULL;
+    return Base64_Decode(base64);
 }
 
 struct Buffer* Argtype_File(char* fname) {
@@ -97,17 +84,9 @@ struct Buffer* Argtype_B64File(char* fname) {
         return NULL;
     }
     // Base64 decode the file into a new arg
-    struct Base64Data decoded = Base64_Decode((char*) file->data);
+    struct Buffer* decoded = Base64_Decode((char*) file->data);
     Argtype_Free(file);
-    if (decoded.valid) {
-        struct Buffer* decoded_file = malloc(sizeof(struct Buffer));
-        if (decoded_file != NULL) {
-            decoded_file->data = decoded.data;
-            decoded_file->length = decoded.length;
-            return decoded_file;
-        }
-    }
-    return NULL;
+    return decoded;
 }
 
 struct Buffer* Argtype_String(char* arg) {

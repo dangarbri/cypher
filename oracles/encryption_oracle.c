@@ -36,10 +36,10 @@ int main(int argc, char* argv[]) {
             }
             // Print the result
             if (ciphertext) {
-                struct Base64Data b64 = Base64_Encode(ciphertext->data, ciphertext->length);
-                if (b64.valid) {
-                    printf("%s\n", b64.data);
-                    free(b64.data);
+                struct Buffer* b64 = Base64_Encode(ciphertext->data, ciphertext->length);
+                if (b64) {
+                    printf("%s\n", b64->data);
+                    Buffer_Free(b64);
                     success = true;
                 }
             }

@@ -54,21 +54,21 @@ struct Buffer* Base64_Encode(uint8_t* data, size_t length) {
                         perror("Base64_Encode");
                     }
                 }
-                BIO_free_all(b64);
+                BIO_free(b64);
             } else {
                 fputs("Failed to encode base64 data\n", stderr);
             }
         } else {
             fputs("Failled to create base64 encoder\n", stderr);
         }
-        BIO_free_all(encoded);
+        BIO_free(encoded);
     } else {
         fputs("Failed to allocate memory for b64 encoded buffer\n", stderr);
     }
     return result;
 }
 
-struct Buffer* Base64_Decode(char* data) {
+struct Buffer* Base64_Decode(const char* data) {
     struct Buffer* result = NULL;
     bool no_newlines = strchr((char*) data, '\n') == NULL;
     size_t length = strlen(data);

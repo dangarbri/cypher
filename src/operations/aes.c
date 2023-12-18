@@ -14,6 +14,7 @@
 struct Buffer* Aes128Ecb(struct Buffer* key, struct Buffer* data, bool encrypt, bool pad) {
     (void)pad;
     if (!Buffer_IsValid(key) || !Buffer_IsValid(data) || (key->length != 16)) {
+        fputs("Invalid input\n", stderr);
         return NULL;
     }
 

@@ -1,5 +1,5 @@
 # Copy required test data to the build folder
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/../test/test_data
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/test_data
      DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 add_definitions(-DNDEBUG=0)

@@ -2,9 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "argtype.h"
 #include "parsers/hex.h"
 #include "parsers/base64.h"
+#include "system.h"
+#include "argtype.h"
 
 #ifdef _MSC_VER
 #define popen _popen
@@ -107,64 +108,10 @@ struct Buffer* Argtype_String(char* arg) {
     return NULL;
 }
 
-struct Buffer* Argtype_Stream(FILE* stream) {
-    size_t blocksize = 1024;
-    size_t bufsize = blocksize;
-    size_t remaining_space = bufsize;
-    size_t bytes_read = 0;
-    struct Buffer* buffer = Buffer_New(bufsize);
-    if (buffer) {
-        bool success = true;
-        while(!feof(stream)) {
-            // Read up to enough bytes to fill the buffer
-            bytes_read += fread(buffer->data + bytes_read, 1, remaining_space, stream);
-            remaining_space = bufsize - bytes_read;
-            if (remaining_space == 0) {
-                size_t extended_size = bufsize + blocksize;
-                // check for overflow
-                if (extended_size < bufsize) {
-                    fputs("Read limit exceeded\n", stderr);
-                    success = false;
-                    break;
-                }
-                bufsize = extended_size;
-                // Need to increase buffer size
-                if (!Buffer_Resize(buffer, bufsize)) {
-                    fputs("Unable to increase buffer size\n", stderr);
-                    success = false;
-                    break;
-                }
-            }
-        }
-        if (!success) {
-            Buffer_Free(buffer);
-            buffer = NULL;
-        }
-    }
-    return buffer;
-}
-
-/**
- * Runs the given command string and uses the command's output as the argument
- */
-struct Buffer* Argtype_Program(char* cmd) {
-    FILE* pipe = popen(cmd, "r");
-    struct Buffer* buffer = NULL;
-    if (pipe) {
-        buffer = Argtype_Stream(pipe);
-        int exit_code = pclose(pipe);
-        if (exit_code != 0) {
-            Buffer_Free(buffer);
-            buffer = NULL;
-        }
-    }
-    return buffer;
-}
-
 struct Buffer* Argtype_StreamDecode(FILE* stream, struct Buffer* (*decoder)(char*)) {
     struct Buffer* result = NULL;
     // Process the stream
-    struct Buffer* stream_contents = Argtype_Stream(stream);
+    struct Buffer* stream_contents = ReadStream(stream);
     if (stream_contents) {
         // Decode the stream's contents
         struct Buffer* decoded = decoder((char*) stream_contents->data);
@@ -188,7 +135,7 @@ struct Buffer* Argtype_StreamHex(FILE* stream) {
 struct Buffer* Argtype_New(char* arg) {
     // stdin arguments
     if ((strlen(arg) == 1) && (strcmp(arg, "-") == 0)) {
-        return Argtype_Stream(stdin);
+        return ReadStream(stdin);
     } else if (strcmp(arg, "base64:-") == 0) {
         return Argtype_StreamB64(stdin);
     } else if (strcmp(arg, "hex:-") == 0) {
@@ -214,7 +161,7 @@ struct Buffer* Argtype_New(char* arg) {
         return Argtype_File(fname);
     } else if (strncmp("prog", type, 4) == 0) {
         char* command = strtok(NULL, delim);
-        return Argtype_Program(command);
+        return System(command);
     } else {
         return Argtype_String(arg);
     }

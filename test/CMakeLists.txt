@@ -9,6 +9,7 @@ link_libraries(${OPENSSL_LIBRARIES})
 set(ARGTYPE_SOURCES
 ../src/parsers/hex.c
 ../src/parsers/base64.c
+../src/cli/system.c
 ../src/cli/argtype.c
 ../src/types/buffer.c
 )
@@ -96,29 +97,20 @@ add_executable(test_crackrbx
 link_libraries(${Openssl_LIBRARIES})
 add_executable(test_aes
   test_aes.c
-  ../src/cli/argtype.c
-  ../src/parsers/hex.c
-  ../src/parsers/base64.c
+  ${ARGTYPE_SOURCES}
   ../src/operations/aes.c
   ../src/operations/pad.c
   ../src/operations/xor.c
-  ../src/types/buffer.c
 )
 add_executable(test_pad
   test_pad.c
+  ${ARGTYPE_SOURCES}
   ../src/operations/pad.c
-  ../src/parsers/hex.c
-  ../src/parsers/base64.c
-  ../src/cli/argtype.c
-  ../src/types/buffer.c
 )
 add_executable(test_xor
   test_xor.c
-  ../src/cli/argtype.c
-  ../src/parsers/base64.c
-  ../src/parsers/hex.c
+  ${ARGTYPE_SOURCES}
   ../src/operations/xor.c
-  ../src/types/buffer.c
 )
 add_executable(test_streplace
   test_streplace.c

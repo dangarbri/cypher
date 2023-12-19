@@ -40,13 +40,13 @@ struct Buffer* Base64_Encode(uint8_t* data, size_t length) {
                 BIO_flush(b64);
                 // Extract encoded data from the encoded bio
                 uint8_t* bio_data;
-                long length = BIO_claim_data(encoded, &bio_data);
-                if (length > 0) {
+                long bufsize = BIO_claim_data(encoded, &bio_data);
+                if (bufsize > 0) {
                     // The result is not null terminated, so let's fix that
                     // Allocate another buffer that is 1 byte larger than the length for space for the null byte.
-                    bio_data = realloc(bio_data, ((size_t)length) + 1);
+                    bio_data = realloc(bio_data, ((size_t)bufsize) + 1);
                     if (bio_data) {
-                        result = Buffer_Wrap(bio_data, ((size_t) length));
+                        result = Buffer_Wrap(bio_data, ((size_t)bufsize));
                         if (result) {
                             result->data[length] = '\0';
                         }

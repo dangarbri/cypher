@@ -15,6 +15,7 @@ else()
   add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 endif()
 find_package(OpenSSL REQUIRED)
+include_directories(${OPENSSL_INCLUDE_DIR})
 
 add_subdirectory(src)
 add_subdirectory(test)

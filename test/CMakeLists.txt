@@ -120,6 +120,10 @@ add_executable(test_xor
   ../src/operations/xor.c
   ../src/types/buffer.c
 )
+add_executable(test_streplace
+  test_streplace.c
+  ../src/strings/replace.c
+)
 
 add_test(NAME Subcommands COMMAND test_subcommand)
 add_test(NAME Parsers COMMAND test_parsers)
@@ -143,4 +147,5 @@ add_test(NAME Rank COMMAND test_rank)
 add_test(NAME Hamming COMMAND test_hamming)
 add_test(NAME AES COMMAND test_aes)
 add_test(NAME Pad COMMAND test_pad)
+add_test(NAME streplace COMMAND test_streplace)
 add_test(NAME ThreadPool COMMAND test_threadpool)

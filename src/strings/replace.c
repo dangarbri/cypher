@@ -5,7 +5,7 @@
 
 #include "replace.h"
 
-char* streplace(char* subject, char* target, char* replacement) {
+char* streplace(char* subject, const char* target, const char* replacement) {
     if (!subject || !target || !replacement) {
         return NULL;
     }

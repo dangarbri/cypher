@@ -114,7 +114,9 @@ add_executable(test_xor
 )
 add_executable(test_streplace
   test_streplace.c
+  ../src/cli/system.c
   ../src/strings/replace.c
+  ../src/types/buffer.c
 )
 
 add_test(NAME Subcommands COMMAND test_subcommand)

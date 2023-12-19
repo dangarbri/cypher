@@ -4,6 +4,7 @@
 
 #include "analyzers/english.h"
 #include "cli/argtype.h"
+#include "cli/flags.h"
 #include "cli/subcommand.h"
 #include "crackers/cracksbx.h"
 #include "crackers/crackrbx.h"
@@ -157,7 +158,8 @@ int CrackCLI_RepeatingXor(int argc, char* argv[]) {
 }
 
 int CrackCLI_EcbLeak(int argc, char* argv[]) {
-    if (argc != 2) {
+    (void)argv;
+    if (argc < 2) {
         puts(
             "Usage:\n"
             "  ecbleak [-b] \"command ...FUZZ...\"\n"
@@ -166,7 +168,7 @@ int CrackCLI_EcbLeak(int argc, char* argv[]) {
             "command must be a program or script which returns encrypted data either\n"
             "as raw binary data, or base64 encoded data\n"
             "If you're testing a web application, it could be a script which\n"
-            "sends the HTTP request and prints the results to stdout\n"
+            "sends the HTTP request, extracts the ciphertext and prints it to stdout\n"
             "\n"
             "A vulnerable application will append some internal data to your user input\n"
             "and encrypt the data via aes-128-ecb mode encryption. That encrypted data\n"
@@ -181,5 +183,14 @@ int CrackCLI_EcbLeak(int argc, char* argv[]) {
         );
         return EXIT_FAILURE;
     }
+    char* cmd = argv[1];
+    bool binary = false;
+    (void)binary;
+    if (FlagExists("-b", argc, argv)) {
+        cmd += 1;
+        binary = true;
+    }
+    struct Buffer* leaked = ECBLeak(cmd, true);
+    Buffer_Free(leaked);
     return EXIT_SUCCESS;
 }

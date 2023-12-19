@@ -9,6 +9,7 @@ link_libraries(
 add_executable(encryption_oracle
   encryption_oracle.c
   ../src/cli/argtype.c
+  ../src/cli/system.c
   ../src/operations/aes.c
   ../src/operations/pad.c
   ../src/operations/xor.c
@@ -19,6 +20,7 @@ add_executable(encryption_oracle
 add_executable(ecb_leak
   ecb_leak.c
   ../src/cli/argtype.c
+  ../src/cli/system.c
   ../src/operations/aes.c
   ../src/operations/pad.c
   ../src/operations/xor.c

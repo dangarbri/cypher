@@ -7,8 +7,7 @@ add_executable(cypher
   cli/argtype.c
   cli/flags.c
   cli/subcommand.c
-  crackers/cracksbx.c
-  crackers/crackrbx.c
+  cli/system.c
   commands/analyze.c
   commands/base64_cli.c
   commands/crack.c
@@ -16,6 +15,9 @@ add_executable(cypher
   commands/print.c
   commands/rand.c
   commands/xor_cli.c
+  crackers/cracksbx.c
+  crackers/crackrbx.c
+  crackers/ecb_leak.c
   operations/aes.c
   operations/hamming.c
   operations/pad.c
@@ -23,6 +25,7 @@ add_executable(cypher
   operations/xor.c
   parsers/base64.c
   parsers/hex.c
+  strings/replace.c
   threading/pool.c
   types/buffer.c
 )

@@ -11,6 +11,6 @@
  * @param verbose Print information as it goes
  * @returns leaked data or NULL on failure.
  */
-struct Buffer* ECBLeak(char* command, bool verbose);
+struct Buffer* ECBLeak(char* command, bool base64, bool verbose);
 
 #endif

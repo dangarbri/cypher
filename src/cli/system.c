@@ -14,6 +14,7 @@ struct Buffer* ReadStream(FILE* stream) {
         while(!feof(stream)) {
             // Read up to enough bytes to fill the buffer
             bytes_read += fread(buffer->data + bytes_read, 1, remaining_space, stream);
+            buffer->length = bytes_read;
             remaining_space = bufsize - bytes_read;
             if (remaining_space == 0) {
                 size_t extended_size = bufsize + blocksize;
@@ -35,6 +36,9 @@ struct Buffer* ReadStream(FILE* stream) {
         if (!success) {
             Buffer_Free(buffer);
             buffer = NULL;
+        } else {
+            // End the input with a null byte
+            buffer->data[bytes_read] = '\0';
         }
     }
     return buffer;

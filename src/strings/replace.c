@@ -16,14 +16,16 @@ char* streplace(char* subject, const char* target, const char* replacement) {
         return NULL;
     }
 
+
     size_t subject_length = strlen(subject);
+    char* cpy_subject = malloc(subject_length + 1);
+    if (!cpy_subject) {
+        return NULL;
+    }
+    strcpy(cpy_subject, subject);
     size_t target_length = strlen(target);
     size_t replacement_length = strlen(replacement);
     size_t final_buffer_size = (subject_length - target_length + replacement_length) + 1;
-    if (final_buffer_size < subject_length) {
-        // overflow detected
-        return NULL;
-    }
     char* outbuf = malloc(final_buffer_size);
     if (!outbuf) {
         perror("streplace");
@@ -35,7 +37,7 @@ char* streplace(char* subject, const char* target, const char* replacement) {
     // String to replace is at the start of the buffer, so there's no "left" side
     if (target_location != subject) {
         // Copy left side of subject
-        ptr = strtok(subject, target);
+        ptr = strtok(cpy_subject, target);
         strcat(outbuf, ptr);
     }
 
@@ -47,6 +49,7 @@ char* streplace(char* subject, const char* target, const char* replacement) {
     if (ptr) {
         strcat(outbuf, ptr);
     }
+    free(cpy_subject);
 
     return outbuf;
 }

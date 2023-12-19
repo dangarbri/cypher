@@ -190,7 +190,7 @@ int CrackCLI_EcbLeak(int argc, char* argv[]) {
         cmd += 1;
         binary = true;
     }
-    struct Buffer* leaked = ECBLeak(cmd, true);
+    struct Buffer* leaked = ECBLeak(cmd, true, true);
     Buffer_Free(leaked);
     return EXIT_SUCCESS;
 }

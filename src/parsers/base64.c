@@ -48,7 +48,7 @@ struct Buffer* Base64_Encode(uint8_t* data, size_t length) {
                     if (bio_data) {
                         result = Buffer_Wrap(bio_data, ((size_t)bufsize));
                         if (result) {
-                            result->data[length] = '\0';
+                            result->data[bufsize] = '\0';
                         }
                     } else {
                         perror("Base64_Encode");

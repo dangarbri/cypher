@@ -152,7 +152,11 @@ struct Buffer* Argtype_Program(char* cmd) {
     struct Buffer* buffer = NULL;
     if (pipe) {
         buffer = Argtype_Stream(pipe);
-        pclose(pipe);
+        int exit_code = pclose(pipe);
+        if (exit_code != 0) {
+            Buffer_Free(buffer);
+            buffer = NULL;
+        }
     }
     return buffer;
 }

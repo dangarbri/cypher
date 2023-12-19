@@ -38,13 +38,22 @@ void test_Argtype_Parse_File() {
     char fname[] = "file:test_data/cypher";
     struct Buffer* arg = Argtype_New(fname);
     assert(arg != NULL);
+#ifdef _MSC_VER
+    // Windows \r adds an extra character
+    assert(arg->length == 47);
+#else
     assert(arg->length == 46);
-    assert(strncmp("Hello, cypher! This spans is 3 128-bit blocks\n", (char*) arg->data, 14) == 0);
+#endif
+    assert(strncmp("Hello, cypher! This spans is 3 128-bit blocks\n", (char*) arg->data, 45) == 0);
     Argtype_Free(arg);
 }
 
 void test_Argtype_Program() {
+#ifdef _MSC_VER
+    char cmd[] = "prog:dir";
+#else
     char cmd[] = "prog:ls -l";
+#endif
     struct Buffer* data = Argtype_New(cmd);
     assert(data != NULL);
     printf("%s", data->data);

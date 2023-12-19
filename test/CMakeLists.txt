@@ -68,12 +68,10 @@ add_executable(test_cracksbx
   ../src/threading/pool.c
   ../src/types/buffer.c
 )
-if(NOT MSVC)
 add_executable(test_threadpool
   test_threadpool.c
   ../src/threading/pool.c
 )
-endif()
 add_executable(test_hamming
   test_hamming.c
   ../src/operations/hamming.c
@@ -145,7 +143,4 @@ add_test(NAME Rank COMMAND test_rank)
 add_test(NAME Hamming COMMAND test_hamming)
 add_test(NAME AES COMMAND test_aes)
 add_test(NAME Pad COMMAND test_pad)
-if(NOT MSVC)
-# Windows is still working on their threads.h
 add_test(NAME ThreadPool COMMAND test_threadpool)
-endif()

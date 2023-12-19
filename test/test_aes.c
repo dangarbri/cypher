@@ -15,6 +15,13 @@ void test_AesEcbEncrypt() {
     assert(expected_result != NULL);
     char plaintext[] = "file:test_data/cypher";
     struct Buffer* pt = Argtype_New(plaintext);
+#ifdef _MSC_VER
+    // Remove carriage return since expected results expects only \n
+    char* carriage_return = strchr((const char*) pt->data, '\r');
+    *carriage_return = '\n';
+    *(carriage_return + 1) = '\0';
+    pt->length -= 1;
+#endif
     assert(pt != NULL);
     struct Buffer* encrypted = Aes128Ecb_Encrypt(key, pt);
     assert(encrypted != NULL);
@@ -35,6 +42,13 @@ void test_AesEcbDecrypt() {
     assert(ct != NULL);
     char plaintext[] = "file:test_data/cypher";
     struct Buffer* pt = Argtype_New(plaintext);
+#ifdef _MSC_VER
+    // Remove carriage return since expected results expects only \n
+    char* carriage_return = strchr((const char*)pt->data, '\r');
+    *carriage_return = '\n';
+    *(carriage_return + 1) = '\0';
+    pt->length -= 1;
+#endif
     assert(pt != NULL);
     struct Buffer* decrypted = Aes128Ecb_Decrypt(key, ct);
     assert(decrypted != NULL);

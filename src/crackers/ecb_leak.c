@@ -32,8 +32,8 @@ struct BlockDetails ECBLeak_FindDetails(char* command, size_t input_size, bool b
 struct Buffer* ECBLeak_Fuzz(char* command, char* data, bool base64);
 struct BlockDetails ECBLeak_ScanXorResult(struct Buffer* xord);
 size_t ECBLeak_FindBlockCrossing(char* command, size_t blocksize, bool base64);
-uint8_t ECBLeak_CrackByte(char* command, size_t target_block, size_t input_length, size_t blocksize, bool base64);
-struct Buffer* ECBLeak_ExtractBlock(char* command, size_t target_block, size_t input_length, size_t details, uint8_t value, bool base64);
+uint8_t ECBLeak_CrackByte(char* command, char* input_block, char* known_bytes, size_t target_block, size_t input_length, size_t blocksize, size_t block_offset, bool base64);
+struct Buffer* ECBLeak_ExtractBlock(char* command, size_t target_block, size_t details, char* value, bool base64);
 
 const char* ECBLEAK_DELIM = "FUZZ";
 const char* ECBLEAK_PREFIX = "ECBLeak";
@@ -61,13 +61,34 @@ struct Buffer* ECBLeak(char* command, bool base64, bool verbose) {
         printf("Message: ");
     }
 
+    // Send a dummy command to allocate a buffer that can hold the plaintext
+    struct Buffer* known_bytes = ECBLeak_Fuzz(command, "a", base64);
+    memset(known_bytes->data, '\0', known_bytes->length);
+    size_t known_ptr = 0;
+
     // Set the input length to be large enough that we control a whole block, but leave one byte short.
     // This will make it so that one byte of the unknown plaintext will get encrypted with our
     // malicious block
-    size_t input_length = block_crossing + details.blocksize - 2;
-    uint8_t byte = ECBLeak_CrackByte(command, details.offset + details.blocksize, input_length, details.blocksize, base64);
-    printf("%c", byte);
-    puts("");
+    size_t input_length = details.blocksize + block_crossing - 2;
+    char* bad_block = malloc(known_bytes->length + 1);
+    setvbuf(stdout, NULL, _IONBF, 0);
+    if (bad_block) {
+        memset(bad_block, '\0', known_bytes->length + 1);
+        size_t block_count = -1;
+        for (size_t i = 0; i < known_bytes->length - details.offset; i++) {
+            if ((i % details.blocksize) == 0) {
+                block_count += 1;
+            }
+            size_t block_offset = block_count * details.blocksize;
+            bad_block[input_length - i + block_offset] = '\0';
+            bad_block[input_length + 1 - i + block_offset] = '\0';
+            memset(bad_block, 'a', input_length - i + block_offset);
+            uint8_t byte = ECBLeak_CrackByte(command, bad_block, (char*) known_bytes->data, details.offset + details.blocksize + block_offset, input_length, details.blocksize, block_count, base64);
+            known_bytes->data[known_ptr++] = byte;
+            printf("%c", byte);
+        }
+        puts("");
+    }
 
     return NULL;
 }
@@ -196,14 +217,17 @@ size_t ECBLeak_FindBlockCrossing(char* command, size_t blocksize, bool base64) {
 /**
  * Crack a single byte where input length is 1 byte shorter than the block length
  */
-uint8_t ECBLeak_CrackByte(char* command, size_t target_block, size_t input_length, size_t blocksize, bool base64) {
+uint8_t ECBLeak_CrackByte(char* command, char* bad_block, char* known_bytes, size_t target_block, size_t input_length, size_t blocksize, size_t block_offset, bool base64) {
     uint8_t result = 0;
     // Extract a ciphertext block
-    struct Buffer* cipherblock = ECBLeak_ExtractBlock(command, target_block, input_length, blocksize, (uint8_t) 'a', base64);
+    struct Buffer* cipherblock = ECBLeak_ExtractBlock(command, target_block, blocksize, bad_block, base64);
     if (cipherblock) {
+        strcat(bad_block, known_bytes);
+        size_t offset = (blocksize * block_offset) + input_length;
         for (size_t i = 1; i < 256; i++) {
             uint8_t value = (uint8_t) i;
-            struct Buffer* testblock = ECBLeak_ExtractBlock(command, target_block, input_length + 1, blocksize, value, base64);
+            bad_block[offset] = value;
+            struct Buffer* testblock = ECBLeak_ExtractBlock(command, target_block, blocksize, bad_block, base64);
             if (testblock) {
                 if (memcmp(testblock->data, cipherblock->data, blocksize) == 0) {
                     result = value;
@@ -225,29 +249,22 @@ uint8_t ECBLeak_CrackByte(char* command, size_t target_block, size_t input_lengt
  * @param blocksize Block size
  * @param base64 flags that command returns base64 data
  */
-struct Buffer* ECBLeak_ExtractBlock(char* command, size_t target_block, size_t input_length, size_t blocksize, uint8_t value, bool base64) {
+struct Buffer* ECBLeak_ExtractBlock(char* command, size_t target_block, size_t blocksize, char* value, bool base64) {
     struct Buffer* out = NULL;
     // Allocate space for fuzz text
-    char* fuzz = malloc(input_length + 1);
-    if (fuzz) {
-        fuzz[input_length] = '\0';
-        memset(fuzz, 'a', input_length);
-        fuzz[input_length - 1] = value;
-        struct Buffer* cipher = ECBLeak_Fuzz(command, fuzz, base64);
-        if (cipher) {
-            size_t end = target_block + blocksize;
-            if (cipher->length >= end) {
-                out = Buffer_New(blocksize + 1);
-                if (out) {
-                    out->data[blocksize] = '\0';
-                    memcpy(out->data, &cipher->data[target_block], blocksize);
-                    Buffer_Free(cipher);
-                }
-            } else {
-                fprintf(stderr, "Invalid target block. Requested %zu, ciphertext length: %zu\n", end, cipher->length);
+    struct Buffer* cipher = ECBLeak_Fuzz(command, value, base64);
+    if (cipher) {
+        size_t end = target_block + blocksize;
+        if (cipher->length >= end) {
+            out = Buffer_New(blocksize + 1);
+            if (out) {
+                out->data[blocksize] = '\0';
+                memcpy(out->data, &cipher->data[target_block], blocksize);
+                Buffer_Free(cipher);
             }
+        } else {
+            fprintf(stderr, "Invalid target block. Requested %zu, ciphertext length: %zu\n", end, cipher->length);
         }
-        free(fuzz);
     }
     return out;
 }

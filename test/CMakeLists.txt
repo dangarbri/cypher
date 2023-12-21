@@ -9,6 +9,7 @@ link_libraries(${OPENSSL_LIBRARIES})
 set(ARGTYPE_SOURCES
 ../src/parsers/hex.c
 ../src/parsers/base64.c
+../src/cli/system.c
 ../src/cli/argtype.c
 ../src/types/buffer.c
 )
@@ -96,28 +97,25 @@ add_executable(test_crackrbx
 link_libraries(${Openssl_LIBRARIES})
 add_executable(test_aes
   test_aes.c
-  ../src/cli/argtype.c
-  ../src/parsers/hex.c
-  ../src/parsers/base64.c
+  ${ARGTYPE_SOURCES}
   ../src/operations/aes.c
   ../src/operations/pad.c
   ../src/operations/xor.c
-  ../src/types/buffer.c
 )
 add_executable(test_pad
   test_pad.c
+  ${ARGTYPE_SOURCES}
   ../src/operations/pad.c
-  ../src/parsers/hex.c
-  ../src/parsers/base64.c
-  ../src/cli/argtype.c
-  ../src/types/buffer.c
 )
 add_executable(test_xor
   test_xor.c
-  ../src/cli/argtype.c
-  ../src/parsers/base64.c
-  ../src/parsers/hex.c
+  ${ARGTYPE_SOURCES}
   ../src/operations/xor.c
+)
+add_executable(test_streplace
+  test_streplace.c
+  ../src/cli/system.c
+  ../src/strings/replace.c
   ../src/types/buffer.c
 )
 
@@ -143,4 +141,5 @@ add_test(NAME Rank COMMAND test_rank)
 add_test(NAME Hamming COMMAND test_hamming)
 add_test(NAME AES COMMAND test_aes)
 add_test(NAME Pad COMMAND test_pad)
+add_test(NAME streplace COMMAND test_streplace)
 add_test(NAME ThreadPool COMMAND test_threadpool)

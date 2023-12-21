@@ -63,31 +63,39 @@ struct Buffer* ECBLeak(char* command, bool base64, bool verbose) {
 
     // Send a dummy command to allocate a buffer that can hold the plaintext
     struct Buffer* known_bytes = ECBLeak_Fuzz(command, "a", base64);
-    memset(known_bytes->data, '\0', known_bytes->length);
-    size_t known_ptr = 0;
+    if (known_bytes) {
+        memset(known_bytes->data, '\0', known_bytes->length);
+        size_t known_ptr = 0;
 
-    // Set the input length to be large enough that we control a whole block, but leave one byte short.
-    // This will make it so that one byte of the unknown plaintext will get encrypted with our
-    // malicious block
-    size_t input_length = details.blocksize + block_crossing - 2;
-    char* bad_block = malloc(known_bytes->length + 1);
-    setvbuf(stdout, NULL, _IONBF, 0);
-    if (bad_block) {
-        memset(bad_block, '\0', known_bytes->length + 1);
-        size_t block_count = -1;
-        for (size_t i = 0; i < known_bytes->length - details.offset; i++) {
-            if ((i % details.blocksize) == 0) {
-                block_count += 1;
+        // Set the input length to be large enough that we control a whole block, but leave one byte short.
+        // This will make it so that one byte of the unknown plaintext will get encrypted with our
+        // malicious block
+        size_t input_length = details.blocksize + block_crossing - 2;
+        char* bad_block = malloc(known_bytes->length + 1);
+        setvbuf(stdout, NULL, _IONBF, 0);
+        if (bad_block) {
+            memset(bad_block, '\0', known_bytes->length + 1);
+            size_t block_count = -1;
+            for (size_t i = 0; i < known_bytes->length - details.offset - details.blocksize; i++) {
+                if ((i % details.blocksize) == 0) {
+                    block_count += 1;
+                }
+                size_t block_offset = block_count * details.blocksize;
+                bad_block[input_length - i + block_offset] = '\0';
+                bad_block[input_length + 1 - i + block_offset] = '\0';
+                memset(bad_block, 'a', input_length - i + block_offset);
+                uint8_t byte = ECBLeak_CrackByte(command, bad_block, (char*) known_bytes->data, details.offset + details.blocksize + block_offset, input_length, details.blocksize, block_count, base64);
+                known_bytes->data[known_ptr++] = byte;
+                if ((byte >= 0x20) || (byte <= 0x7F)) {
+                    printf("%c", byte);
+                } else {
+                    printf("\\x%02x", byte);
+                }
             }
-            size_t block_offset = block_count * details.blocksize;
-            bad_block[input_length - i + block_offset] = '\0';
-            bad_block[input_length + 1 - i + block_offset] = '\0';
-            memset(bad_block, 'a', input_length - i + block_offset);
-            uint8_t byte = ECBLeak_CrackByte(command, bad_block, (char*) known_bytes->data, details.offset + details.blocksize + block_offset, input_length, details.blocksize, block_count, base64);
-            known_bytes->data[known_ptr++] = byte;
-            printf("%c", byte);
+            puts("");
+            free(bad_block);
         }
-        puts("");
+        Buffer_Free(known_bytes);
     }
 
     return NULL;
@@ -231,6 +239,7 @@ uint8_t ECBLeak_CrackByte(char* command, char* bad_block, char* known_bytes, siz
             if (testblock) {
                 if (memcmp(testblock->data, cipherblock->data, blocksize) == 0) {
                     result = value;
+                    Buffer_Free(testblock);
                     break;
                 }
                 Buffer_Free(testblock);
@@ -260,11 +269,11 @@ struct Buffer* ECBLeak_ExtractBlock(char* command, size_t target_block, size_t b
             if (out) {
                 out->data[blocksize] = '\0';
                 memcpy(out->data, &cipher->data[target_block], blocksize);
-                Buffer_Free(cipher);
             }
         } else {
             fprintf(stderr, "Invalid target block. Requested %zu, ciphertext length: %zu\n", end, cipher->length);
         }
+        Buffer_Free(cipher);
     }
     return out;
 }
